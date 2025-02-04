@@ -59,7 +59,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     val nav_version = "2.8.6"
-
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation ("com.firebaseui:firebase-ui-auth:7.2.0")
+    implementation ("com.facebook.android:facebook-android-sdk:8.x")
 
 }
