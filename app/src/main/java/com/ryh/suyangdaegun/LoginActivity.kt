@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -31,10 +33,7 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginScreen(
-                onGoogleLogin = { navigateToAccessionNavigator() },
-                onKakaoLogin = { navigateToAccessionNavigator() },
-                onNaverLogin = { navigateToAccessionNavigator() }
+            LoginScreen(navController = rememberNavController()
             )
         }
     }
@@ -78,11 +77,8 @@ class LoginActivity : ComponentActivity() {
 //}
 
 @Composable
-fun LoginScreen(
-    onGoogleLogin: () -> Unit,
-    onKakaoLogin: () -> Unit,
-    onNaverLogin: () -> Unit
-) {
+fun LoginScreen(navController: NavController)
+ {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -105,7 +101,7 @@ fun LoginScreen(
                 .fillMaxHeight(0.26f)
         ) {
             Button(
-                onClick = onKakaoLogin,
+                onClick = { navController.navigate("accession") }, // 회원가입 네비게이션
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 16.dp)
@@ -114,7 +110,7 @@ fun LoginScreen(
             }
 
             Button(
-                onClick = onGoogleLogin,
+                onClick = { navController.navigate("accession") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 16.dp)
@@ -123,19 +119,12 @@ fun LoginScreen(
             }
 
             Button(
-                onClick = onNaverLogin,
+                onClick = { navController.navigate("accession") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
                 Text("Naver 로그인")
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.9f)
-            ) {
-
             }
         }
     }

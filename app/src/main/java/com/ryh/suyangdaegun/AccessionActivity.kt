@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,18 +45,45 @@ class AccessionActivity : ComponentActivity() {
 // 네비게이션 컨트롤러
 @Composable
 fun AccessionNavigator(navController: NavHostController) {
-    val viewModel: RegistrationViewModel = androidx.lifecycle.viewmodel.compose.viewModel() // ViewModel 인스턴스 관리
+    val viewModel: RegistrationViewModel = viewModel() // ViewModel 인스턴스 관리
 
     NavHost(
         navController = navController,
         startDestination = "gender"
     ) {
-        composable("gender") { GenderStep(viewModel = viewModel, onNext = { navController.navigate("nickname") }) }
-        composable("nickname") { NicknameStep(viewModel = viewModel, onNext = { navController.navigate("birthdate") }) }
-        composable("birthdate") { BirthdateStep(viewModel = viewModel, onNext = { navController.navigate("profilePicture") }) }
-        composable("profilePicture") { ProfilePictureStep(viewModel = viewModel, onNext = { navController.navigate("interests") }) }
-        composable("interests") { InterestsStep(viewModel = viewModel, onNext = { navController.navigate("complete") }) }
-        composable("complete") { CompleteStep(viewModel = viewModel, navController = navController) } // 여기서 AppNavigator의 navController를 사용
+        composable("gender") {
+            GenderStep(viewModel = viewModel,
+                onNext = { navController.navigate("nickname") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("nickname") {
+            NicknameStep(viewModel = viewModel,
+                onNext = { navController.navigate("birthdate") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("birthdate") {
+            BirthdateStep(viewModel = viewModel,
+                onNext = { navController.navigate("profilePicture") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("profilePicture") {
+            ProfilePictureStep(viewModel = viewModel,
+                onNext = { navController.navigate("interests") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("interests") {
+            InterestsStep(viewModel = viewModel,
+                onNext = { navController.navigate("complete") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("complete") {
+            CompleteStep(viewModel = viewModel, navController = navController)
+        }
     }
 }
 
@@ -63,21 +91,15 @@ fun AccessionNavigator(navController: NavHostController) {
 
 // 성별 선택 화면
 @Composable
-fun GenderStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
+fun GenderStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
     var selectedGender by remember { mutableStateOf("") }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        NavigationBar { }
-        StandardSpacer(0.07f)
-        TitleSection(
-            "안녕하세요! 정보를 입력해주세요", "프로필을 만들고" +
-                    "바로 커뮤니케이션을 시작하는 데 도움이 되는 간단한 정보를 알려주세요."
-        )
-        StandardSpacer(0.06f)
 
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        NavigationBar(onBack = onBack)
+        StandardSpacer(0.07f)
+        TitleSection("안녕하세요! 정보를 입력해주세요", "프로필을 만들고 바로 커뮤니케이션을 시작하는 데 도움이 되는 간단한 정보를 알려주세요.")
+
+        StandardSpacer(0.06f)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -87,6 +109,7 @@ fun GenderStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
         }
 
         StandardSpacer(0.48f)
+
         Button(onClick = {
             viewModel.gender = selectedGender
             onNext()
@@ -98,7 +121,7 @@ fun GenderStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
 
 // 닉네임 입력 화면
 @Composable
-fun NicknameStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
+fun NicknameStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
     var nickname by remember { mutableStateOf("") }
 
     Column(
@@ -118,6 +141,7 @@ fun NicknameStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
         )
 
         StandardSpacer(0.6f)
+
         Button(onClick = {
             viewModel.nickname = nickname
             onNext()
@@ -129,7 +153,7 @@ fun NicknameStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
 
 // 생년월일 입력 화면
 @Composable
-fun BirthdateStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
+fun BirthdateStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
     var birthdate by remember { mutableStateOf("") }
     var birthtime by remember { mutableStateOf("") }
     Column(
@@ -169,7 +193,7 @@ fun BirthdateStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
 
 // 관심사 선택 화면
 @Composable
-fun InterestsStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
+fun InterestsStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
     val allInterests = listOf("독서", "여행", "운동", "음악", "요리")
     var selectedInterests by remember { mutableStateOf(listOf<String>()) }
 
@@ -219,7 +243,7 @@ fun InterestsStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
 
 // 프로필 사진 업로드 화면
 @Composable
-fun ProfilePictureStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
+fun ProfilePictureStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
         Text("프로필 사진을 업로드하세요")
 
@@ -256,9 +280,7 @@ fun SajuAnalysisStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
 @Composable
 fun CompleteStep(viewModel: RegistrationViewModel, navController: NavHostController) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -267,13 +289,14 @@ fun CompleteStep(viewModel: RegistrationViewModel, navController: NavHostControl
 
         Button(onClick = {
             navController.navigate("main") {
-                popUpTo("login") { inclusive = true } // 로그인 및 회원가입 단계를 스택에서 제거
+                popUpTo(0) { inclusive = true } // **스택 전체 초기화**
             }
         }) {
             Text("메인 화면으로 이동")
         }
     }
 }
+
 
 
 // 공통 네비게이션 바
