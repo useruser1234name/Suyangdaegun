@@ -28,49 +28,54 @@ import com.google.firebase.auth.GoogleAuthProvider
 
 
 class LoginActivity : ComponentActivity() {
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             LoginScreen(
-                onGoogleLogin = { googleSignIn() },
-                onKakaoLogin = { kakaoSignIn() },
-                onNaverLogin = { naverSignIn() }
+                onGoogleLogin = { navigateToAccessionNavigator() },
+                onKakaoLogin = { navigateToAccessionNavigator() },
+                onNaverLogin = { navigateToAccessionNavigator() }
             )
         }
     }
 
-    private fun googleSignIn() {
-        // 예제: Google 로그인 로직 구현
-        Toast.makeText(this, "Google 로그인 구현 필요", Toast.LENGTH_SHORT).show()
-        firebaseAuth.signInWithCredential(GoogleAuthProvider.getCredential(null, null))
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    navigateToMain()
-                } else {
-                    Toast.makeText(this, "Google 로그인 실패", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    private fun kakaoSignIn() {
-        Toast.makeText(this, "Kakao 로그인 구현 필요", Toast.LENGTH_SHORT).show()
-        // Kakao 로그인 로직 추가
-        navigateToMain() // 성공 시 메인 화면 이동
-    }
-
-    private fun naverSignIn() {
-        Toast.makeText(this, "Naver 로그인 구현 필요", Toast.LENGTH_SHORT).show()
-        // Naver 로그인 로직 추가
-        navigateToMain() // 성공 시 메인 화면 이동
-    }
-
-    private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+    private fun navigateToAccessionNavigator() {
+        val intent = Intent(this, AccessionActivity::class.java)
+        startActivity(intent)
+        finish() // 현재 액티비티 종료
     }
 }
+
+//    private fun googleSignIn() {
+//        // 예제: Google 로그인 로직 구현
+//        Toast.makeText(this, "Google 로그인 구현 필요", Toast.LENGTH_SHORT).show()
+//        firebaseAuth.signInWithCredential(GoogleAuthProvider.getCredential(null, null))
+//            .addOnCompleteListener {
+//                if (it.isSuccessful) {
+//                    navigateToMain()
+//                } else {
+//                    Toast.makeText(this, "Google 로그인 실패", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//    }
+//
+//    private fun kakaoSignIn() {
+//        Toast.makeText(this, "Kakao 로그인 구현 필요", Toast.LENGTH_SHORT).show()
+//        // Kakao 로그인 로직 추가
+//        navigateToMain() // 성공 시 메인 화면 이동
+//    }
+//
+//    private fun naverSignIn() {
+//        Toast.makeText(this, "Naver 로그인 구현 필요", Toast.LENGTH_SHORT).show()
+//        // Naver 로그인 로직 추가
+//        navigateToMain() // 성공 시 메인 화면 이동
+//    }
+//
+//    private fun navigateToMain() {
+//        startActivity(Intent(this, MainActivity::class.java))
+//        finish()
+//    }
+//}
 
 @Composable
 fun LoginScreen(

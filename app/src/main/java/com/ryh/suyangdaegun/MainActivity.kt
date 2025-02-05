@@ -64,13 +64,13 @@ fun AppNavigator() {
     // 로그인 상태 확인
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            delay(1000) // 로딩 화면 대체
+            delay(1500) // 로딩 화면 대체
             if (firebaseAuth.currentUser != null) {
                 navController.navigate("main") {
                     popUpTo("loading") { inclusive = true }
                 }
             } else {
-                navController.navigate("login") {
+                navController.navigate("accession") {
                     popUpTo("loading") { inclusive = true }
                 }
             }
@@ -79,14 +79,14 @@ fun AppNavigator() {
 
     NavHost(
         navController = navController,
-        startDestination = "loading"
+        startDestination = "login"
     ) {
         composable("loading") { LoadingScreen() }
         composable("login") {
             LoginScreen(
-                onGoogleLogin = { /* Google 로그인 구현 */ },
-                onKakaoLogin = { /* Kakao 로그인 구현 */ },
-                onNaverLogin = { /* Naver 로그인 구현 */ }
+                onGoogleLogin = { navController.navigate("accession") },
+                onKakaoLogin = { navController.navigate("accession") },
+                onNaverLogin = { navController.navigate("accession") }
             )
         }
         composable("main") {
@@ -95,6 +95,9 @@ fun AppNavigator() {
                 onNavigateToChatList = { navController.navigate("chatList") },
                 onNavigateToMyPage = { navController.navigate("myPage") }
             )
+        }
+        composable("accession") {
+            AccessionNavigator(navController = navController)
         }
         composable("matching") {
             MatchingScreen(onNavigateBack = { navController.popBackStack() })

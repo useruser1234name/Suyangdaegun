@@ -34,16 +34,17 @@ class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AccessionNavigator()
+            val navController = rememberNavController() // NavController 생성
+            AccessionNavigator(navController) // NavController 전달
+
         }
     }
 }
 
 // 네비게이션 컨트롤러
 @Composable
-fun AccessionNavigator() {
-    val viewModel: RegistrationViewModel = remember { RegistrationViewModel() }
-    val navController = rememberNavController()
+fun AccessionNavigator(navController: NavHostController) {
+    val viewModel: RegistrationViewModel = androidx.lifecycle.viewmodel.compose.viewModel() // ViewModel 인스턴스 관리
 
     NavHost(
         navController = navController,
@@ -54,7 +55,7 @@ fun AccessionNavigator() {
         composable("birthdate") { BirthdateStep(viewModel = viewModel, onNext = { navController.navigate("profilePicture") }) }
         composable("profilePicture") { ProfilePictureStep(viewModel = viewModel, onNext = { navController.navigate("interests") }) }
         composable("interests") { InterestsStep(viewModel = viewModel, onNext = { navController.navigate("complete") }) }
-        composable("complete") { CompleteStep(viewModel = viewModel, onNext = {}) }
+        composable("complete") { CompleteStep(viewModel = viewModel, navController = navController) } // 여기서 AppNavigator의 navController를 사용
     }
 }
 
@@ -253,7 +254,7 @@ fun SajuAnalysisStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
 
 // 회원가입 완료 화면
 @Composable
-fun CompleteStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
+fun CompleteStep(viewModel: RegistrationViewModel, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -263,9 +264,17 @@ fun CompleteStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
     ) {
         Text("회원가입이 완료되었습니다!")
         Spacer(modifier = Modifier.padding(16.dp))
-        NextButton(onNext = { /* 메인 화면으로 이동 */ })
+
+        Button(onClick = {
+            navController.navigate("main") {
+                popUpTo("login") { inclusive = true } // 로그인 및 회원가입 단계를 스택에서 제거
+            }
+        }) {
+            Text("메인 화면으로 이동")
+        }
     }
 }
+
 
 // 공통 네비게이션 바
 @Composable
