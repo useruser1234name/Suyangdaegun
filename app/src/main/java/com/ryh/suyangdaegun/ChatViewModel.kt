@@ -79,8 +79,8 @@ class ChatViewModel : ViewModel() {
             .whereNotEqualTo("sender", currentUserUID)
             .get()
             .addOnSuccessListener { snapshot ->
-                snapshot.documents.forEach { document ->
-                    batch.update(document.reference, "isRead", true)
+                for (doc in snapshot.documents) {
+                    doc.reference.update("isRead", true)
                 }
                 batch.commit()
             }

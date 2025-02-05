@@ -33,7 +33,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun MainScreen(
     onNavigateToMatching: () -> Unit,
@@ -55,8 +54,6 @@ fun MainScreen(
         }
     }
 }
-
-
 
 @Composable
 fun AppNavigator() {
@@ -92,8 +89,6 @@ fun AppNavigator() {
                 onNaverLogin = { /* Naver 로그인 구현 */ }
             )
         }
-
-        // Main Screen
         composable("main") {
             MainScreen(
                 onNavigateToMatching = { navController.navigate("matching") },
@@ -101,33 +96,17 @@ fun AppNavigator() {
                 onNavigateToMyPage = { navController.navigate("myPage") }
             )
         }
-
-        // Matching Screen
         composable("matching") {
-            MatchingScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
+            MatchingScreen(onNavigateBack = { navController.popBackStack() })
         }
-
-        // Chat List Screen
         composable("chatList") {
-            ChatListScreen(
-                onNavigateToChat = { navController.navigate("chat") }
-            )
+            ChatListScreen(onNavigateToChat = { navController.navigate("chat") })
         }
-
-        // Chat Screen
         composable("chat") {
-            ChatScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
+            ChatScreen(viewModel = ChatViewModel())
         }
-
-        // My Page Screen
         composable("myPage") {
-            MyPageScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
+            MyPageScreen(onNavigateBack = { navController.popBackStack() })
         }
     }
 }

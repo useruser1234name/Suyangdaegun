@@ -28,11 +28,11 @@ fun ChatScreen(viewModel: ChatViewModel) {
             reverseLayout = true
         ) {
             items(messages) { message ->
-                if (message.sender == viewModel.currentUserUID) {
-                    UserMessage(message.content)
-                } else {
-                    OtherUserMessage(message.content, message.isRead)
-                }
+                MessageBubble(
+                    content = message.content,
+                    isUserMessage = message.sender == viewModel.currentUserUID,
+                    isRead = message.isRead
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -67,36 +67,23 @@ fun ChatScreen(viewModel: ChatViewModel) {
 }
 
 @Composable
-fun UserMessage(content: String) {
+fun MessageBubble(content: String, isUserMessage: Boolean, isRead: Boolean) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = if (isUserMessage) Arrangement.End else Arrangement.Start
     ) {
         Box(
             modifier = Modifier
-                .background(Color(0xFFE1F5FE), shape = CircleShape)
-                .padding(12.dp)
-        ) {
-            Text(content, fontSize = 16.sp)
-        }
-    }
-}
-
-@Composable
-fun OtherUserMessage(content: String, isRead: Boolean) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Box(
-            modifier = Modifier
-                .background(Color(0xFFFFF9C4), shape = CircleShape)
+                .background(
+                    if (isUserMessage) Color(0xFFE1F5FE) else Color(0xFFFFF9C4),
+                    shape = CircleShape
+                )
                 .padding(12.dp)
         ) {
             Text(content, fontSize = 16.sp)
         }
 
-        if (!isRead) {
+        if (!isUserMessage && !isRead) {
             Spacer(modifier = Modifier.width(8.dp))
             UnreadCountIndicator(1)
         }
@@ -120,3 +107,4 @@ fun UnreadCountIndicator(unreadCount: Int) {
         }
     }
 }
+
