@@ -95,4 +95,14 @@ dependencies {
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
+
+    // Jetpack Lifecycle (ViewModel)
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
+
+    // Compose
+    implementation ("androidx.compose.ui:ui:1.3.3")
+    implementation ("androidx.compose.material3:material3:1.1.0")
+    implementation ("androidx.activity:activity-compose:1.6.1")
+
  }

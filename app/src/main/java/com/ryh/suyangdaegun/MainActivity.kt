@@ -5,14 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,55 +19,56 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController() // NavController 생성
-            AppNavigator(navController = navController) // NavController 전달
+            val navController = rememberNavController()
+            AppNavigator(navController = navController)
         }
     }
 }
-
 
 @Composable
-fun MainScreen(
-    onNavigateToMatching: () -> Unit,
-    onNavigateToChatList: () -> Unit,
-    onNavigateToMyPage: () -> Unit
-) {
+fun MainScreen(navController: NavHostController) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Main Screen", modifier = Modifier.padding(16.dp))
-        Button(
-            onClick = onNavigateToMatching,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Go to Matching")
+        Text("메인 화면", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { navController.navigate("matching") }) {
+            Text("매칭 화면으로 이동")
         }
-        Button(
-            onClick = onNavigateToChatList,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Go to Chat List")
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { navController.navigate("chatList") }) {
+            Text("채팅 리스트로 이동")
         }
-        Button(
-            onClick = onNavigateToMyPage,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Go to My Page")
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { navController.navigate("myPage") }) {
+            Text("마이 페이지로 이동")
         }
     }
 }
 
+@Composable
+fun AppNavigator(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") { LoginScreen(navController) }
+        composable("accession") { AccessionScreen(navController) }
+        composable("main") { MainScreen(navController) }
+        composable("matching") { MatchingScreen(navController) }
+        composable("chatList") { ChatListScreen(navController) }
+        composable("chatting") { ChattingScreen(navController) }
+        composable("myPage") { MyPageScreen(navController) }
+        composable("faceAnalysis") { FaceAnalysisScreen(navController) }
+    }
+}

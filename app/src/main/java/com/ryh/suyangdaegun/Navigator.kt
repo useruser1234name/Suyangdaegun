@@ -1,11 +1,14 @@
 package com.ryh.suyangdaegun
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 
 
 //@Composable
@@ -67,81 +70,45 @@ import androidx.navigation.compose.rememberNavController
 //    }
 //}
 
-@Composable
-fun AppNavigator(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = "login"
-    ) {
-        composable("login") {
-            LoginScreen(navController = navController)
-        }
-        composable("accession") {
-            AccessionNavigator(navController = navController) // NavController 전달
-        }
-        composable("main") {
-            MainScreen(
-                onNavigateToMatching = { navController.navigate("matching") },
-                onNavigateToChatList = { navController.navigate("chatList") },
-                onNavigateToMyPage = { navController.navigate("myPage") }
-            )
-        }
-    }
-}
+//@Composable
+//fun AppNavigator(navController: NavHostController, startDestination: String) {
+//    CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {
+//        NavHost(navController = navController, startDestination = startDestination) {
+//            composable("login") { LoginScreen(navController) }
+//            composable("accession") { AccessionNavigator(navController) }
+//            composable("main") { MainScreen(navController) }
+//        }
+//    }
+//}
 
 
 
-
-
-
-// 네비게이션 컨트롤러
-@Composable
-fun AccessionNavigator(navController: NavHostController) {
-    val viewModel: RegistrationViewModel = viewModel()
-
-    NavHost(
-        navController = navController, // AppNavigator에서 전달받은 navController 사용
-        startDestination = "gender"
-    ) {
-        composable("gender") {
-            GenderStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("nickname") },
-                onBack = { navController.popBackStack() }
-            )
-        }
-        composable("nickname") {
-            NicknameStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("birthdate") },
-                onBack = { navController.popBackStack() }
-            )
-        }
-        composable("birthdate") {
-            BirthdateStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("profilePicture") },
-                onBack = { navController.popBackStack() }
-            )
-        }
-        composable("profilePicture") {
-            ProfilePictureStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("interests") },
-                onBack = { navController.popBackStack() }
-            )
-        }
-        composable("interests") {
-            InterestsStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("complete") },
-                onBack = { navController.popBackStack() }
-            )
-        }
-        composable("complete") {
-            CompleteStep(viewModel = viewModel, navController = navController)
-        }
-    }
-}
-
-
+//// 네비게이션 컨트롤러
+//@Composable
+//fun AccessionNavigator(navController: NavHostController) {
+//    val viewModel: RegistrationViewModel = viewModel()
+//
+//    NavHost(
+//        navController = navController,
+//        startDestination = "gender"
+//    ) {
+//        composable("gender") {
+//            GenderStep(navController, viewModel)
+//        }
+//        composable("nickname") {
+//            NicknameStep(navController, viewModel)
+//        }
+//        composable("birthdate") {
+//            BirthdateStep(navController, viewModel)
+//        }
+//        composable("profilePicture") {
+//            ProfilePictureStep(navController, viewModel)
+//        }
+//        composable("interests") {
+//            InterestsStep(navController, viewModel)
+//        }
+//        composable("complete") {
+//            CompleteStep(navController, viewModel)
+//        }
+//    }
+//}

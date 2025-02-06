@@ -1,305 +1,222 @@
 package com.ryh.suyangdaegun
 
-import android.graphics.Bitmap
-import android.net.Uri
-import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Nickname
-import android.provider.MediaStore
-import android.telecom.Call
-import android.util.Base64
-import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.common.api.Response
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.IOException
 
-class AccessionActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val navController = rememberNavController() // NavController 생성
-            AccessionNavigator(navController) // NavController 전달
-
-        }
-    }
-}
-
-// 성별 선택 화면
 @Composable
-fun GenderStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
-    var selectedGender by remember { mutableStateOf("") }
+fun AccessionScreen(navController: NavHostController) {
+    val viewModel: RegistrationViewModel = viewModel()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        NavigationBar(onBack = onBack)
-        StandardSpacer(0.07f)
-        TitleSection("안녕하세요! 정보를 입력해주세요", "프로필을 만들고 바로 커뮤니케이션을 시작하는 데 도움이 되는 간단한 정보를 알려주세요.")
-
-        StandardSpacer(0.06f)
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(onClick = { selectedGender = "남성" }) { Text("남성") }
-            Button(onClick = { selectedGender = "여성" }) { Text("여성") }
-        }
-
-        StandardSpacer(0.48f)
-
-        Button(onClick = {
-            viewModel.gender = selectedGender
-            onNext()
-        }, enabled = selectedGender.isNotEmpty()) {
-            Text("다음")
-        }
-    }
-}
-
-// 닉네임 입력 화면
-@Composable
-fun NicknameStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
-    var nickname by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
+    NavHost(
+        navController = navController,
+        startDestination = "gender"
     ) {
-        NavigationBar { }
-        StandardSpacer(0.07f)
-        TitleSection("이름을 설정해주세요", "본명을 사용하면 더 신뢰받을 수 있어요.")
-
-        OutlinedTextField(
-            value = nickname,
-            onValueChange = { nickname = it },
-            label = { Text("이름") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        StandardSpacer(0.6f)
-
-        Button(onClick = {
-            viewModel.nickname = nickname
-            onNext()
-        }, enabled = nickname.isNotEmpty()) {
-            Text("다음")
+        composable("gender") {
+            GenderStep(navController, viewModel)
+        }
+        composable("nickname") {
+            NicknameStep(navController, viewModel)
+        }
+        composable("birthdate") {
+            BirthdateStep(navController, viewModel)
+        }
+        composable("profilePicture") {
+            ProfilePictureStep(navController, viewModel)
+        }
+        composable("interests") {
+            InterestsStep(navController, viewModel)
+        }
+        composable("complete") {
+            CompleteStep(navController, viewModel)
         }
     }
 }
 
-// 생년월일 입력 화면
 @Composable
-fun BirthdateStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
-    var birthdate by remember { mutableStateOf("") }
-    var birthtime by remember { mutableStateOf("") }
+fun GenderStep(navController: NavHostController, viewModel: RegistrationViewModel) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        NavigationBar { }
-        StandardSpacer(0.07f)
-        TitleSection("${viewModel.nickname}님 생년월일과 출생 시간을 입력해주세요", "나중에 변경할 수 없습니다.")
-
-        OutlinedTextField(
-            value = birthdate,
-            onValueChange = { birthdate = it },
-            label = { Text("생년월일") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = birthtime,
-            onValueChange = { birthtime = it },
-            label = { Text("출생 시간") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        StandardSpacer(0.6f)
-
-        Button(onClick = {
-            viewModel.birthdate = birthdate
-            viewModel.birthtime = birthtime
-            onNext()
-        }, enabled = birthdate.isNotEmpty() && birthtime.isNotEmpty()) {
-            Text("다음")
-        }
-    }
-}
-
-// 관심사 선택 화면
-@Composable
-fun InterestsStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
-    val allInterests = listOf("독서", "여행", "운동", "음악", "요리")
-    var selectedInterests by remember { mutableStateOf(listOf<String>()) }
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        NavigationBar { }
-        StandardSpacer(0.07f)
-        TitleSection("${viewModel.nickname} 관심사를 선택해주세요", "")
-
-        Column {
-            allInterests.forEach { interest ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = selectedInterests.contains(interest),
-                        onCheckedChange = {
-                            selectedInterests = if (selectedInterests.contains(interest)) {
-                                selectedInterests - interest
-                            } else {
-                                selectedInterests + interest
-                            }
-                        }
-                    )
-                    Text(interest, modifier = Modifier.padding(start = 8.dp))
-                }
-            }
-        }
-
-        StandardSpacer(0.4f)
-
-        Button(onClick = {
-            viewModel.interests = selectedInterests
-            onNext()
-        }, enabled = selectedInterests.isNotEmpty()) {
-            Text("다음")
-        }
-    }
-}
-
-// 프로필 사진 업로드 화면
-@Composable
-fun ProfilePictureStep(viewModel: RegistrationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
-        Text("프로필 사진을 업로드하세요")
-
-        // TODO: 사진 업로드 기능 추가 (갤러리에서 선택)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { onNext() }) {
-            Text("다음")
-        }
-    }
-}
-
-@Composable
-fun SajuAnalysisStep(viewModel: RegistrationViewModel, onNext: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
-        Text("관상 및 사주 분석 진행 중...")
-
-        // TODO: Flask 서버 요청 후 결과 표시
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            viewModel.sajuAnalysis = "GPT 분석 결과..."
-            onNext()
-        }) {
-            Text("다음")
-        }
-    }
-}
-
-
-// 회원가입 완료 화면
-@Composable
-fun CompleteStep(viewModel: RegistrationViewModel, navController: NavHostController) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("회원가입이 완료되었습니다!")
-        Spacer(modifier = Modifier.padding(16.dp))
+        Text("성별을 선택하세요", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            navController.navigate("main") {
-                popUpTo("login") { inclusive = true } // 회원가입 및 로그인 화면 제거 후 main으로 이동
+            viewModel.setGender("남성")
+            navController.navigate("nickname")
+        }) {
+            Text("남성")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = {
+            viewModel.setGender("여성")
+            navController.navigate("nickname")
+        }) {
+            Text("여성")
+        }
+    }
+}
+
+@Composable
+fun NicknameStep(navController: NavHostController, viewModel: RegistrationViewModel) {
+    var nickname by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("닉네임을 입력하세요", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = nickname,
+            onValueChange = { nickname = it },
+            label = { Text("닉네임") }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            if (nickname.isNotBlank()) {
+                viewModel.setNickname(nickname)
+                navController.navigate("birthdate")
             }
         }) {
-            Text("메인 화면으로 이동")
+            Text("다음")
         }
     }
 }
 
 
-
-
-// 공통 네비게이션 바
 @Composable
-fun NavigationBar(onBack: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth(0.14f)
-        ) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")
-        }
-        Divider(
-            thickness = 1.dp,
-            color = Color.Black,
-            modifier = Modifier.fillMaxWidth(0.86f)
-        )
-    }
-}
+fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewModel) {
+    var birthdate by remember { mutableStateOf("") }
 
-// 공통 타이틀 텍스트
-@Composable
-fun TitleSection(title: String, subtitle: String) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(title)
-        Text(subtitle)
+        Text("생년월일을 입력하세요", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = birthdate,
+            onValueChange = { birthdate = it },
+            label = { Text("YYYY-MM-DD") }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            if (birthdate.isNotBlank()) {
+                viewModel.setBirthdate(birthdate)
+                navController.navigate("profilePicture")
+            }
+        }) {
+            Text("다음")
+        }
     }
 }
 
-// 공통 Spacer
 @Composable
-fun StandardSpacer(heightFraction: Float) {
-    Spacer(modifier = Modifier.fillMaxHeight(heightFraction))
+fun ProfilePictureStep(navController: NavHostController, viewModel: RegistrationViewModel) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("프로필 사진을 업로드하세요", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            viewModel.setProfilePicture("example_image_url") // 임시 URL
+            navController.navigate("interests")
+        }) {
+            Text("사진 업로드")
+        }
+    }
 }
 
-// 공통 Next 버튼
 @Composable
-fun NextButton(onNext: () -> Unit, enabled: Boolean = true) {
-    Button(
-        onClick = onNext,
-        enabled = enabled,
-        modifier = Modifier.fillMaxWidth()
+fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {
+    val interests = listOf("운동", "독서", "음악", "여행")
+    val selectedInterests = remember { mutableStateListOf<String>() }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("다음")
+        Text("관심사를 선택하세요", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        interests.forEach { interest ->
+            Button(onClick = {
+                if (selectedInterests.contains(interest)) {
+                    selectedInterests.remove(interest)
+                } else {
+                    selectedInterests.add(interest)
+                }
+            }) {
+                Text(interest)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            viewModel.setInterests(selectedInterests)
+            navController.navigate("complete")
+        }) {
+            Text("다음")
+        }
+    }
+}
+
+@Composable
+fun CompleteStep(navController: NavHostController, viewModel: RegistrationViewModel) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("회원가입이 완료되었습니다!", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { navController.navigate("login") }) {
+            Text("로그인 화면으로 이동")
+        }
     }
 }
 
