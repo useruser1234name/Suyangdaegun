@@ -1,0 +1,77 @@
+Index: app/src/main/java/com/ryh/suyangdaegun/Navigator.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun\r\n\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.CompositionLocalProvider\r\nimport androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner\r\nimport androidx.lifecycle.viewmodel.compose.viewModel\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.google.firebase.auth.FirebaseAuth\r\n\r\n\r\n//@Composable\r\n//fun AppNavigator() {\r\n//    val navController = rememberNavController()\r\n//    val firebaseAuth = FirebaseAuth.getInstance()\r\n//    val coroutineScope = rememberCoroutineScope()\r\n//\r\n//    // 로그인 상태 확인\r\n//    LaunchedEffect(Unit) {\r\n//        coroutineScope.launch {\r\n//            delay(1500) // 로딩 화면 대체\r\n//            if (firebaseAuth.currentUser != null) {\r\n//                navController.navigate(\"main\") {\r\n//                    popUpTo(\"loading\") { inclusive = true }\r\n//                }\r\n//            } else {\r\n//                navController.navigate(\"accession\") {\r\n//                    popUpTo(\"loading\") { inclusive = true }\r\n//                }\r\n//            }\r\n//        }\r\n//    }\r\n//\r\n//    NavHost(\r\n//        navController = navController,\r\n//        startDestination = \"login\"\r\n//    ) {\r\n//        composable(\"loading\") { LoadingScreen() }\r\n//        composable(\"login\") {\r\n//            LoginScreen(\r\n//                onGoogleLogin = { navController.navigate(\"accession\") },\r\n//                onKakaoLogin = { navController.navigate(\"accession\") },\r\n//                onNaverLogin = { navController.navigate(\"accession\") }\r\n//            )\r\n//        }\r\n//        composable(\"main\") {\r\n//            MainScreen(\r\n//                onNavigateToMatching = { navController.navigate(\"matching\") },\r\n//                onNavigateToChatList = { navController.navigate(\"chatList\") },\r\n//                onNavigateToMyPage = { navController.navigate(\"myPage\") }\r\n//            )\r\n//        }\r\n//        composable(\"accession\") {\r\n//            AccessionNavigator(navController = navController)\r\n//        }\r\n//        composable(\"matching\") {\r\n//            MatchingScreen(onNavigateBack = { navController.popBackStack() })\r\n//        }\r\n//        composable(\"chatList\") {\r\n//            ChatListScreen(onNavigateToChat = { navController.navigate(\"chat\") })\r\n//        }\r\n//        composable(\"chat\") {\r\n//            ChatScreen(viewModel = ChatViewModel())\r\n//        }\r\n//        composable(\"myPage\") {\r\n//            MyPageScreen(onNavigateBack = { navController.popBackStack() })\r\n//        }\r\n//    }\r\n//}\r\n\r\n//@Composable\r\n//fun AppNavigator(navController: NavHostController, startDestination: String) {\r\n//    CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {\r\n//        NavHost(navController = navController, startDestination = startDestination) {\r\n//            composable(\"login\") { LoginScreen(navController) }\r\n//            composable(\"accession\") { AccessionNavigator(navController) }\r\n//            composable(\"main\") { MainScreen(navController) }\r\n//        }\r\n//    }\r\n//}\r\n\r\n\r\n\r\n//// 네비게이션 컨트롤러\r\n//@Composable\r\n//fun AccessionNavigator(navController: NavHostController) {\r\n//    val viewModel: RegistrationViewModel = viewModel()\r\n//\r\n//    NavHost(\r\n//        navController = navController,\r\n//        startDestination = \"gender\"\r\n//    ) {\r\n//        composable(\"gender\") {\r\n//            GenderStep(navController, viewModel)\r\n//        }\r\n//        composable(\"nickname\") {\r\n//            NicknameStep(navController, viewModel)\r\n//        }\r\n//        composable(\"birthdate\") {\r\n//            BirthdateStep(navController, viewModel)\r\n//        }\r\n//        composable(\"profilePicture\") {\r\n//            ProfilePictureStep(navController, viewModel)\r\n//        }\r\n//        composable(\"interests\") {\r\n//            InterestsStep(navController, viewModel)\r\n//        }\r\n//        composable(\"complete\") {\r\n//            CompleteStep(navController, viewModel)\r\n//        }\r\n//    }\r\n//}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/Navigator.kt b/app/src/main/java/com/ryh/suyangdaegun/Navigator.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/Navigator.kt	(revision d64c660f2e6e268b0569ac5ba22c8df84feaaf3c)
++++ b/app/src/main/java/com/ryh/suyangdaegun/Navigator.kt	(date 1738811927501)
+@@ -83,32 +83,37 @@
+ 
+ 
+ 
+-//// 네비게이션 컨트롤러
+-//@Composable
+-//fun AccessionNavigator(navController: NavHostController) {
+-//    val viewModel: RegistrationViewModel = viewModel()
+-//
+-//    NavHost(
+-//        navController = navController,
+-//        startDestination = "gender"
+-//    ) {
+-//        composable("gender") {
+-//            GenderStep(navController, viewModel)
+-//        }
+-//        composable("nickname") {
+-//            NicknameStep(navController, viewModel)
+-//        }
+-//        composable("birthdate") {
+-//            BirthdateStep(navController, viewModel)
+-//        }
+-//        composable("profilePicture") {
+-//            ProfilePictureStep(navController, viewModel)
+-//        }
+-//        composable("interests") {
+-//            InterestsStep(navController, viewModel)
+-//        }
+-//        composable("complete") {
+-//            CompleteStep(navController, viewModel)
+-//        }
+-//    }
+-//}
++// 네비게이션 컨트롤러
++@Composable
++fun AccessionNavigator(navController: NavHostController) {
++    val viewModel: RegistrationViewModel = viewModel()
++
++    NavHost(
++        navController = navController,
++        startDestination = "login"
++    ) {
++
++        composable("login") {
++            LoginScreen(navController)
++        }
++
++        composable("gender") {
++            GenderStep(navController, viewModel)
++        }
++        composable("nickname") {
++            NicknameStep(navController, viewModel)
++        }
++        composable("birthdate") {
++            BirthdateStep(navController, viewModel)
++        }
++        composable("profilePicture") {
++            ProfilePictureStep(navController, viewModel)
++        }
++        composable("interests") {
++            InterestsStep(navController, viewModel)
++        }
++        composable("complete") {
++            CompleteStep(navController, viewModel)
++        }
++    }
++}

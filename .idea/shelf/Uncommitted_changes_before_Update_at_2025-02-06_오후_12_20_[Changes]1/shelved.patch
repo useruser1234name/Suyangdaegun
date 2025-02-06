@@ -1,0 +1,37 @@
+Index: app/src/main/java/com/ryh/suyangdaegun/LoginActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun\r\n\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.navigation.NavHostController\r\n\r\n@Composable\r\nfun LoginScreen(navController: NavHostController) {\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"로그인 화면\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = { navController.navigate(\"accession\") }) {\r\n            Text(\"회원가입\")\r\n        }\r\n\r\n        Spacer(modifier = Modifier.height(8.dp))\r\n\r\n        Button(onClick = { navController.navigate(\"main\") }) {\r\n            Text(\"로그인\")\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/LoginActivity.kt b/app/src/main/java/com/ryh/suyangdaegun/LoginActivity.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/LoginActivity.kt	(revision d64c660f2e6e268b0569ac5ba22c8df84feaaf3c)
++++ b/app/src/main/java/com/ryh/suyangdaegun/LoginActivity.kt	(date 1738811585090)
+@@ -19,7 +19,7 @@
+ 
+         Spacer(modifier = Modifier.height(16.dp))
+ 
+-        Button(onClick = { navController.navigate("accession") }) {
++        Button(onClick = { navController.navigate("gender") }) {
+             Text("회원가입")
+         }
+ 
+Index: app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun.ui.theme\r\n\r\nimport androidx.compose.ui.graphics.Color\r\n\r\nval Purple80 = Color(0xFFD0BCFF)\r\nval PurpleGrey80 = Color(0xFFCCC2DC)\r\nval Pink80 = Color(0xFFEFB8C8)\r\n\r\nval Purple40 = Color(0xFF6650a4)\r\nval PurpleGrey40 = Color(0xFF625b71)\r\nval Pink40 = Color(0xFF7D5260)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt b/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt	(revision d64c660f2e6e268b0569ac5ba22c8df84feaaf3c)
++++ b/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt	(date 1738811087081)
+@@ -5,6 +5,7 @@
+ val Purple80 = Color(0xFFD0BCFF)
+ val PurpleGrey80 = Color(0xFFCCC2DC)
+ val Pink80 = Color(0xFFEFB8C8)
++val Button1 = Color(0xFFF5F5F8)
+ 
+ val Purple40 = Color(0xFF6650a4)
+ val PurpleGrey40 = Color(0xFF625b71)
