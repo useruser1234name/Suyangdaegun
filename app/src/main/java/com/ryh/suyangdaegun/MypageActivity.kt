@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun MyPageScreen(navController: NavHostController) {
@@ -22,5 +23,17 @@ fun MyPageScreen(navController: NavHostController) {
         Button(onClick = { navController.navigate("main") }) {
             Text("메인 화면으로 돌아가기")
         }
+    }
+}
+
+@Composable
+fun LogoutButton(navController: NavHostController) {
+    val auth = FirebaseAuth.getInstance()
+
+    Button(onClick = {
+        auth.signOut()
+        navController.navigate("login") // 로그아웃 후 로그인 화면으로 이동
+    }) {
+        Text("로그아웃")
     }
 }

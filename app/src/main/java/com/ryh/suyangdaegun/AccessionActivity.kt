@@ -1,5 +1,6 @@
 package com.ryh.suyangdaegun
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.ryh.suyangdaegun.auth.RegistrationViewModel
 
 //@Composable
 //fun AccessionScreen(navController: NavHostController) {
@@ -205,18 +207,17 @@ fun CompleteStep(navController: NavHostController, viewModel: RegistrationViewMo
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("회원가입이 완료되었습니다!", style = MaterialTheme.typography.headlineMedium)
+        Text("회원가입 완료!", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            // 최상위 NavController로 돌아가기
-            navController.navigate("login") {
-                popUpTo("gender") { inclusive = true }
-            }
+            viewModel.saveUserData(
+                onSuccess = { navController.navigate("main") },
+                onFailure = { e -> Log.e("CompleteStep", "회원가입 저장 실패", e) }
+            )
         }) {
-            Text("로그인 화면으로 이동")
+            Text("메인 화면으로 이동")
         }
     }
 }
-

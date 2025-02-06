@@ -1,25 +1,60 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.auth
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegistrationViewModel : ViewModel() {
-    var gender by mutableStateOf("")
-        private set
-    var nickname by mutableStateOf("")
-        private set
-    var birthdate by mutableStateOf("")
-        private set
-    var profilePicture by mutableStateOf("")
-        private set
-    var interests = mutableStateListOf<String>()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    fun setGender(value: String) { gender = value }
-    fun setNickname(value: String) { nickname = value }
-    fun setBirthdate(value: String) { birthdate = value }
-    fun setProfilePicture(value: String) { profilePicture = value }
-    fun setInterests(value: List<String>) { interests.clear(); interests.addAll(value) }
+    // 사용자 정보 변수
+    var gender: String = ""
+        private set
+    var nickname: String = ""
+        private set
+    var birthdate: String = ""
+        private set
+    var profilePicture: String = ""
+        private set
+    var interests: List<String> = listOf()
+        private set
+
+    // 정보 설정 메서드
+    fun setGender(newGender: String) {
+        gender = newGender
+    }
+
+    fun setNickname(newNickname: String) {
+        nickname = newNickname
+    }
+
+    fun setBirthdate(newBirthdate: String) {
+        birthdate = newBirthdate
+    }
+
+    fun setProfilePicture(newProfilePicture: String) {
+        profilePicture = newProfilePicture
+    }
+
+    fun setInterests(newInterests: List<String>) {
+        interests = newInterests
+    }
+
+    // Firebase에 사용자 데이터 저장
+    fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val uid = auth.currentUser?.uid ?: return
+        val userData = hashMapOf(
+            "gender" to gender,
+            "nickname" to nickname,
+            "birthdate" to birthdate,
+            "profilePicture" to profilePicture,
+            "interests" to interests
+        )
+
+        db.collection("users").document(uid)
+            .set(userData)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
 }

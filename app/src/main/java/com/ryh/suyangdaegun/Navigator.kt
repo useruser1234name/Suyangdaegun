@@ -1,5 +1,6 @@
 package com.ryh.suyangdaegun
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -9,10 +10,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-
+import com.ryh.suyangdaegun.auth.RegistrationViewModel
 
 @Composable
-fun AppNavigator(navController: NavHostController = rememberNavController()) {
+fun AppNavigator(navController: NavHostController = rememberNavController(), activity: Activity) {
     val viewModel: RegistrationViewModel = viewModel() // RegistrationViewModel 생성
 
     CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {
@@ -20,7 +21,7 @@ fun AppNavigator(navController: NavHostController = rememberNavController()) {
             navController = navController,
             startDestination = "login"
         ) {
-            composable("login") { LoginScreen(navController) }
+            composable("login") { LoginScreen(navController, activity) }
             composable("main") { MainScreen(navController) }
             composable("matching") { MatchingScreen(navController) }
             composable("chatList") { ChatListScreen(navController) }
