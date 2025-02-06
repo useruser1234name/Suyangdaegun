@@ -1,0 +1,18 @@
+Index: app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun.ui.theme\r\n\r\nimport androidx.compose.ui.graphics.Color\r\n\r\nval Purple80 = Color(0xFFD0BCFF)\r\nval PurpleGrey80 = Color(0xFFCCC2DC)\r\nval Pink80 = Color(0xFFEFB8C8)\r\n\r\nval Purple40 = Color(0xFF6650a4)\r\nval PurpleGrey40 = Color(0xFF625b71)\r\nval Pink40 = Color(0xFF7D5260)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt b/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt	(revision 6ab151d1257f341195e071b5d2074070394687a7)
++++ b/app/src/main/java/com/ryh/suyangdaegun/ui/theme/Color.kt	(date 1738807918693)
+@@ -5,6 +5,7 @@
+ val Purple80 = Color(0xFFD0BCFF)
+ val PurpleGrey80 = Color(0xFFCCC2DC)
+ val Pink80 = Color(0xFFEFB8C8)
++val Button1 = Color(0xFFF5F5F8)
+ 
+ val Purple40 = Color(0xFF6650a4)
+ val PurpleGrey40 = Color(0xFF625b71)
