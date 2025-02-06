@@ -24,26 +24,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+
 
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginScreen(navController = rememberNavController()
-            )
+            val navController = rememberNavController()
+            AppNavigator(navController = navController) // NavController 전달
         }
     }
-
-    private fun navigateToAccessionNavigator() {
-        val intent = Intent(this, AccessionActivity::class.java)
-        startActivity(intent)
-        finish() // 현재 액티비티 종료
-    }
 }
+
+//    private fun navigateToAccessionNavigator() {
+//        val intent = Intent(this, AccessionActivity::class.java)
+//        startActivity(intent)
+//        finish() // 현재 액티비티 종료
+//    }
+//}
 
 //    private fun googleSignIn() {
 //        // 예제: Google 로그인 로직 구현
@@ -77,16 +80,17 @@ class LoginActivity : ComponentActivity() {
 //}
 
 @Composable
-fun LoginScreen(navController: NavController)
- {
+fun LoginScreen(navController: NavHostController) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = Color.White)
-                .fillMaxWidth(0.65f),
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -94,35 +98,36 @@ fun LoginScreen(navController: NavController)
             Text(text = "새로운 인연", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
         }
 
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.26f)
+                .fillMaxHeight(0.26f),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { navController.navigate("accession") }, // 회원가입 네비게이션
+                onClick = { navController.navigate("accession") }, // Kakao 로그인 -> 회원가입 화면
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
                 Text("Kakao 로그인")
             }
 
             Button(
-                onClick = { navController.navigate("accession") },
+                onClick = { navController.navigate("accession") }, // Google 로그인 -> 회원가입 화면
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
                 Text("Google 로그인")
             }
 
             Button(
-                onClick = { navController.navigate("accession") },
+                onClick = { navController.navigate("accession") }, // Naver 로그인 -> 회원가입 화면
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
                 Text("Naver 로그인")
             }

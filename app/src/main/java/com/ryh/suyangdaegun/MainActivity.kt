@@ -28,10 +28,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppNavigator()
+            val navController = rememberNavController() // NavController 생성
+            AppNavigator(navController = navController) // NavController 전달
         }
     }
 }
+
 
 @Composable
 fun MainScreen(
@@ -70,101 +72,3 @@ fun MainScreen(
     }
 }
 
-//@Composable
-//fun AppNavigator() {
-//    val navController = rememberNavController()
-//    val firebaseAuth = FirebaseAuth.getInstance()
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    // 로그인 상태 확인
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            delay(1500) // 로딩 화면 대체
-//            if (firebaseAuth.currentUser != null) {
-//                navController.navigate("main") {
-//                    popUpTo("loading") { inclusive = true }
-//                }
-//            } else {
-//                navController.navigate("accession") {
-//                    popUpTo("loading") { inclusive = true }
-//                }
-//            }
-//        }
-//    }
-//
-//    NavHost(
-//        navController = navController,
-//        startDestination = "login"
-//    ) {
-//        composable("loading") { LoadingScreen() }
-//        composable("login") {
-//            LoginScreen(
-//                onGoogleLogin = { navController.navigate("accession") },
-//                onKakaoLogin = { navController.navigate("accession") },
-//                onNaverLogin = { navController.navigate("accession") }
-//            )
-//        }
-//        composable("main") {
-//            MainScreen(
-//                onNavigateToMatching = { navController.navigate("matching") },
-//                onNavigateToChatList = { navController.navigate("chatList") },
-//                onNavigateToMyPage = { navController.navigate("myPage") }
-//            )
-//        }
-//        composable("accession") {
-//            AccessionNavigator(navController = navController)
-//        }
-//        composable("matching") {
-//            MatchingScreen(onNavigateBack = { navController.popBackStack() })
-//        }
-//        composable("chatList") {
-//            ChatListScreen(onNavigateToChat = { navController.navigate("chat") })
-//        }
-//        composable("chat") {
-//            ChatScreen(viewModel = ChatViewModel())
-//        }
-//        composable("myPage") {
-//            MyPageScreen(onNavigateBack = { navController.popBackStack() })
-//        }
-//    }
-//}
-
-@Composable
-fun AppNavigator() {
-    val navController = rememberNavController()
-
-
-    NavHost(
-        navController = navController,
-        startDestination = "login" // 기본 진입점을 로그인 화면으로 변경
-    ) {
-        composable("loading") { LoadingScreen() }
-        composable("login") {
-            LoginScreen(
-                navController = navController // NavController 직접 전달
-            )
-        }
-        composable("main") {
-            MainScreen(
-                onNavigateToMatching = { navController.navigate("matching") },
-                onNavigateToChatList = { navController.navigate("chatList") },
-                onNavigateToMyPage = { navController.navigate("myPage") }
-            )
-        }
-        composable("accession") {
-            AccessionNavigator(navController = navController)
-        }
-        composable("matching") {
-            MatchingScreen(onNavigateBack = { navController.popBackStack() })
-        }
-        composable("chatList") {
-            ChatListScreen(onNavigateToChat = { navController.navigate("chat") })
-        }
-        composable("chat") {
-            ChatScreen(viewModel = ChatViewModel())
-        }
-        composable("myPage") {
-            MyPageScreen(onNavigateBack = { navController.popBackStack() })
-        }
-    }
-}
