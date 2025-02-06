@@ -41,9 +41,9 @@ class RegistrationViewModel : ViewModel() {
         interests = newInterests
     }
 
-    // Firebase에 사용자 데이터 저장
+    // ✅ Firestore에 사용자 데이터 저장
     fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid ?: return // ✅ UID 가져오기
         val userData = hashMapOf(
             "gender" to gender,
             "nickname" to nickname,

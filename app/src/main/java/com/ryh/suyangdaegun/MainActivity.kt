@@ -3,6 +3,7 @@ package com.ryh.suyangdaegun
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,35 +13,51 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.FirebaseAuth
+import com.ryh.suyangdaegun.auth.AuthManager
 
 class MainActivity : ComponentActivity() {
+    private lateinit var authManager: AuthManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            val navController = rememberNavController()
-            val auth = FirebaseAuth.getInstance()
+        // ✅ Application에서 authManager 가져오기
+        authManager = (application as SuyangdaegunApp).authManager
 
-            LaunchedEffect(Unit) {
-                if (auth.currentUser != null) {
-                    navController.navigate("main") // 자동 로그인 성공 시 메인 화면으로 이동
+        val googleSignInLauncher =
+            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    authManager.handleSignInResult(
+                        data = result.data,
+                        onSuccess = { isExistingUser, uid ->
+                            if (isExistingUser) {
+                                finish()  // ✅ Main 화면이므로 그대로 유지
+                            } else {
+                                navigateToAccession(uid)
+                            }
+                        },
+                        onFailure = { e -> android.util.Log.e("MainActivity", "로그인 실패", e) }
+                    )
+                } else {
+                    android.util.Log.e("MainActivity", "Google 로그인 취소됨")
                 }
             }
 
-            AppNavigator(activity = this)
+        setContent {
+            AppNavigator(googleSignInLauncher, authManager)
         }
+    }
+
+    private fun navigateToAccession(uid: String) {
+        val intent = android.content.Intent(this, AccessionActivity::class.java).apply {
+            putExtra("uid", uid)
+        }
+        startActivity(intent)
+        finish()
     }
 }
 
