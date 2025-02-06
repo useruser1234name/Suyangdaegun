@@ -12,9 +12,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,15 +63,29 @@ fun MainScreen(navController: NavHostController) {
 }
 
 @Composable
-fun AppNavigator(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "login") {
-        composable("login") { LoginScreen(navController) }
-        composable("accession") { AccessionScreen(navController) }
-        composable("main") { MainScreen(navController) }
-        composable("matching") { MatchingScreen(navController) }
-        composable("chatList") { ChatListScreen(navController) }
-        composable("chatting") { ChattingScreen(navController) }
-        composable("myPage") { MyPageScreen(navController) }
-        composable("faceAnalysis") { FaceAnalysisScreen(navController) }
+fun AppNavigator(navController: NavHostController = rememberNavController()) {
+    val viewModel: RegistrationViewModel = viewModel() // RegistrationViewModel 생성
+
+    CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {
+        NavHost(
+            navController = navController,
+            startDestination = "login"
+        ) {
+            composable("login") { LoginScreen(navController) }
+            composable("main") { MainScreen(navController) }
+            composable("matching") { MatchingScreen(navController) }
+            composable("chatList") { ChatListScreen(navController) }
+            composable("chatting") { ChattingScreen(navController) }
+            composable("myPage") { MyPageScreen(navController) }
+            composable("faceAnalysis") { FaceAnalysisScreen(navController) }
+
+            // 회원가입 관련 경로
+            composable("gender") { GenderStep(navController, viewModel) }
+            composable("nickname") { NicknameStep(navController, viewModel) }
+            composable("birthdate") { BirthdateStep(navController, viewModel) }
+            composable("profilePicture") { ProfilePictureStep(navController, viewModel) }
+            composable("interests") { InterestsStep(navController, viewModel) }
+            composable("complete") { CompleteStep(navController, viewModel) }
+        }
     }
 }

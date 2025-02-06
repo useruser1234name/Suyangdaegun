@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -18,39 +19,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
-@Composable
-fun AccessionScreen(navController: NavHostController) {
-    val viewModel: RegistrationViewModel = viewModel()
+//@Composable
+//fun AccessionScreen(navController: NavHostController) {
+//    val viewModel: RegistrationViewModel = viewModel()
+//
+//    CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {
+//        NavHost(
+//            navController = navController,
+//            startDestination = "gender"
+//        ) {
+//            composable("gender") { GenderStep(navController, viewModel) }
+//            composable("nickname") { NicknameStep(navController, viewModel) }
+//            composable("birthdate") { BirthdateStep(navController, viewModel) }
+//            composable("profilePicture") { ProfilePictureStep(navController, viewModel) }
+//            composable("interests") { InterestsStep(navController, viewModel) }
+//            composable("complete") {
+//                CompleteStep(navController, viewModel)
+//            }
+//        }
+//    }
+//}
 
-    NavHost(
-        navController = navController,
-        startDestination = "gender"
-    ) {
-        composable("gender") {
-            GenderStep(navController, viewModel)
-        }
-        composable("nickname") {
-            NicknameStep(navController, viewModel)
-        }
-        composable("birthdate") {
-            BirthdateStep(navController, viewModel)
-        }
-        composable("profilePicture") {
-            ProfilePictureStep(navController, viewModel)
-        }
-        composable("interests") {
-            InterestsStep(navController, viewModel)
-        }
-        composable("complete") {
-            CompleteStep(navController, viewModel)
-        }
-    }
-}
 
 @Composable
 fun GenderStep(navController: NavHostController, viewModel: RegistrationViewModel) {
@@ -214,7 +209,12 @@ fun CompleteStep(navController: NavHostController, viewModel: RegistrationViewMo
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate("login") }) {
+        Button(onClick = {
+            // 최상위 NavController로 돌아가기
+            navController.navigate("login") {
+                popUpTo("gender") { inclusive = true }
+            }
+        }) {
             Text("로그인 화면으로 이동")
         }
     }

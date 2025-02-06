@@ -19,7 +19,7 @@ fun LoginScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate("accession") }) {
+        Button(onClick = { navController.navigate("gender") }) {
             Text("회원가입")
         }
 
