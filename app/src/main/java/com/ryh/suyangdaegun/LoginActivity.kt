@@ -9,6 +9,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ryh.suyangdaegun.auth.AuthManager
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.ui.unit.dp
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
 fun LoginScreen(navController: NavHostController, activity: Activity) {
@@ -17,46 +52,141 @@ fun LoginScreen(navController: NavHostController, activity: Activity) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .background(color = Color.White),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "로그인 화면",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                navController.navigate("gender") // 회원가입 네비게이션 경로
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.White)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "회원가입")
+            Image(
+                painter = painterResource(id = R.drawable.suyang),
+                contentDescription = "Logo Image",
+                modifier = Modifier.size(width = 230.dp, height = 50.dp),
+                contentScale = ContentScale.Inside
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(text = "새로운 인연", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(230.dp))
 
-        Button(
-            onClick = {
-                authManager.signInWithGoogle(
-                    onSuccess = { isExistingUser ->
-                        if (isExistingUser) {
-                            navController.navigate("main") // 메인 화면으로 이동
-                        } else {
-                            navController.navigate("gender") // 회원가입 화면으로 이동
-                        }
-                    },
-                    onFailure = { exception ->
-                        // 에러 처리
-                    }
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+            ,
+//                .fillMaxHeight(0.4f)
+//            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Google 로그인")
+
+            Button(
+                onClick = { navController.navigate("gender") }, // Kakao 로그인 -> 회원가입 화면
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    ,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFF5F5F8)
+                )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_kakao),
+                        contentDescription = "Kakao icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.width(80.dp))
+                    Text("카카오로 로그인", color = Color.Black, fontSize = 20.sp)
+                }
+            }
+            Spacer(modifier = Modifier.height(23.dp))
+            Button(
+                onClick = {
+                    authManager.signInWithGoogle(
+                        onSuccess = { isExistingUser ->
+                            if (isExistingUser) {
+                                navController.navigate("main") // 메인 화면으로 이동
+                            } else {
+                                navController.navigate("gender") // 회원가입 화면으로 이동
+                            }
+                        },
+                        onFailure = { exception ->
+                            // 에러 처리
+                        }
+                    )
+                }, // Google 로그인 -> 회원가입 화면
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    ,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFF5F5F8)
+                )
+            )
+            {
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = "google icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.width(80.dp))
+                    Text("Google로 로그인", color = Color.Black, fontSize = 20.sp)
+                }
+            }
+            Spacer(modifier = Modifier.height(23.dp))
+            Button(
+                onClick = { navController.navigate("main") }, // Naver 로그인 -> 회원가입 화면
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    ,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFF5F5F8)
+                )
+            )
+            {
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_naver),
+                        contentDescription = "Kakao icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.width(80.dp))
+
+                    Text("네이버로 로그인", color = Color.Black, fontSize = 20.sp)
+                }
+            }
         }
     }
 }
