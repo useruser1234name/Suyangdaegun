@@ -1,0 +1,228 @@
+Index: app/src/main/java/com/ryh/suyangdaegun/RegistrationViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun\r\n\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.lifecycle.ViewModel\r\n\r\nclass RegistrationViewModel : ViewModel() {\r\n    var gender by mutableStateOf(\"\")\r\n        private set\r\n    var nickname by mutableStateOf(\"\")\r\n        private set\r\n    var birthdate by mutableStateOf(\"\")\r\n        private set\r\n    var profilePicture by mutableStateOf(\"\")\r\n        private set\r\n    var interests = mutableStateListOf<String>()\r\n\r\n    fun setGender(value: String) { gender = value }\r\n    fun setNickname(value: String) { nickname = value }\r\n    fun setBirthdate(value: String) { birthdate = value }\r\n    fun setProfilePicture(value: String) { profilePicture = value }\r\n    fun setInterests(value: List<String>) { interests.clear(); interests.addAll(value) }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/RegistrationViewModel.kt b/app/src/main/java/com/ryh/suyangdaegun/RegistrationViewModel.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/RegistrationViewModel.kt	(revision 2ef15b32381d195c8454c0c2aeb112fce17ddc80)
++++ b/app/src/main/java/com/ryh/suyangdaegun/RegistrationViewModel.kt	(date 1738817392218)
+@@ -1,25 +1,25 @@
+ package com.ryh.suyangdaegun
+-
+-import androidx.compose.runtime.getValue
+-import androidx.compose.runtime.mutableStateListOf
+-import androidx.compose.runtime.mutableStateOf
+-import androidx.compose.runtime.setValue
+-import androidx.lifecycle.ViewModel
+-
+-class RegistrationViewModel : ViewModel() {
+-    var gender by mutableStateOf("")
+-        private set
+-    var nickname by mutableStateOf("")
+-        private set
+-    var birthdate by mutableStateOf("")
+-        private set
+-    var profilePicture by mutableStateOf("")
+-        private set
+-    var interests = mutableStateListOf<String>()
+-
+-    fun setGender(value: String) { gender = value }
+-    fun setNickname(value: String) { nickname = value }
+-    fun setBirthdate(value: String) { birthdate = value }
+-    fun setProfilePicture(value: String) { profilePicture = value }
+-    fun setInterests(value: List<String>) { interests.clear(); interests.addAll(value) }
+-}
++//
++//import androidx.compose.runtime.getValue
++//import androidx.compose.runtime.mutableStateListOf
++//import androidx.compose.runtime.mutableStateOf
++//import androidx.compose.runtime.setValue
++//import androidx.lifecycle.ViewModel
++//
++//class RegistrationViewModel : ViewModel() {
++//    var gender by mutableStateOf("")
++//        private set
++//    var nickname by mutableStateOf("")
++//        private set
++//    var birthdate by mutableStateOf("")
++//        private set
++//    var profilePicture by mutableStateOf("")
++//        private set
++//    var interests = mutableStateListOf<String>()
++//
++//    fun setGender(value: String) { gender = value }
++//    fun setNickname(value: String) { nickname = value }
++//    fun setBirthdate(value: String) { birthdate = value }
++//    fun setProfilePicture(value: String) { profilePicture = value }
++//    fun setInterests(value: List<String>) { interests.clear(); interests.addAll(value) }
++//}
+Index: app/src/main/java/com/ryh/suyangdaegun/AuthViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun\r\n\r\nimport android.app.Activity\r\nimport android.content.Intent\r\nimport android.util.Log\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.viewModelScope\r\nimport com.google.android.gms.auth.api.identity.BeginSignInRequest\r\nimport com.google.android.gms.auth.api.identity.Identity\r\nimport com.google.android.gms.auth.api.identity.SignInClient\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.auth.FirebaseUser\r\nimport com.google.firebase.auth.GoogleAuthProvider\r\nimport kotlinx.coroutines.launch\r\n\r\nclass AuthViewModel : ViewModel() {\r\n    private val auth: FirebaseAuth = FirebaseAuth.getInstance()\r\n    private lateinit var oneTapClient: SignInClient\r\n    private lateinit var signInRequest: BeginSignInRequest\r\n\r\n    fun getCurrentUser(): FirebaseUser? {\r\n        return auth.currentUser // 자동 로그인 체크용\r\n    }\r\n\r\n    fun initializeGoogleSignIn(activity: Activity) {\r\n        oneTapClient = Identity.getSignInClient(activity)\r\n\r\n        signInRequest = BeginSignInRequest.builder()\r\n            .setGoogleIdTokenRequestOptions(\r\n                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()\r\n                    .setSupported(true)\r\n                    .setServerClientId(\"YOUR_WEB_CLIENT_ID\") // Firebase 콘솔에서 가져온 Web Client ID 입력\r\n                    .setFilterByAuthorizedAccounts(false)\r\n                    .build()\r\n            )\r\n            .build()\r\n    }\r\n\r\n    fun signInWithGoogle(activity: Activity, onResult: (Boolean, Boolean, String?) -> Unit) {\r\n        viewModelScope.launch {\r\n            try {\r\n                val signInIntent = oneTapClient.beginSignIn(signInRequest).result.pendingIntent.intentSender\r\n                activity.startIntentSenderForResult(\r\n                    signInIntent, GOOGLE_SIGN_IN, null, 0, 0, 0, null\r\n                )\r\n            } catch (e: Exception) {\r\n                Log.e(\"GoogleSignIn\", \"Google Sign-In Failed\", e)\r\n                onResult(false, false, e.localizedMessage)\r\n            }\r\n        }\r\n    }\r\n\r\n    fun handleSignInResult(data: Intent?, onResult: (Boolean, Boolean, String?) -> Unit) {\r\n        val googleCredential = Identity.getSignInClient(data!!.context).getSignInCredentialFromIntent(data)\r\n        val googleIdToken = googleCredential.googleIdToken\r\n\r\n        if (googleIdToken != null) {\r\n            val credential = GoogleAuthProvider.getCredential(googleIdToken, null)\r\n            auth.signInWithCredential(credential)\r\n                .addOnCompleteListener { task ->\r\n                    if (task.isSuccessful) {\r\n                        val isNewUser = task.result.additionalUserInfo?.isNewUser == true\r\n                        onResult(true, isNewUser, null) // isNewUser = true이면 회원가입 진행\r\n                    } else {\r\n                        onResult(false, false, task.exception?.message)\r\n                    }\r\n                }\r\n        } else {\r\n            onResult(false, false, \"Google ID Token is null\")\r\n        }\r\n    }\r\n\r\n    fun signOut() {\r\n        auth.signOut()\r\n    }\r\n\r\n    companion object {\r\n        const val GOOGLE_SIGN_IN = 9001\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/AuthViewModel.kt b/app/src/main/java/com/ryh/suyangdaegun/AuthViewModel.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/AuthViewModel.kt	(revision 2ef15b32381d195c8454c0c2aeb112fce17ddc80)
++++ b/app/src/main/java/com/ryh/suyangdaegun/AuthViewModel.kt	(date 1738817392223)
+@@ -1,80 +1,80 @@
+ package com.ryh.suyangdaegun
+-
+-import android.app.Activity
+-import android.content.Intent
+-import android.util.Log
+-import androidx.lifecycle.ViewModel
+-import androidx.lifecycle.viewModelScope
+-import com.google.android.gms.auth.api.identity.BeginSignInRequest
+-import com.google.android.gms.auth.api.identity.Identity
+-import com.google.android.gms.auth.api.identity.SignInClient
+-import com.google.firebase.auth.FirebaseAuth
+-import com.google.firebase.auth.FirebaseUser
+-import com.google.firebase.auth.GoogleAuthProvider
+-import kotlinx.coroutines.launch
+-
+-class AuthViewModel : ViewModel() {
+-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+-    private lateinit var oneTapClient: SignInClient
+-    private lateinit var signInRequest: BeginSignInRequest
+-
+-    fun getCurrentUser(): FirebaseUser? {
+-        return auth.currentUser // 자동 로그인 체크용
+-    }
+-
+-    fun initializeGoogleSignIn(activity: Activity) {
+-        oneTapClient = Identity.getSignInClient(activity)
+-
+-        signInRequest = BeginSignInRequest.builder()
+-            .setGoogleIdTokenRequestOptions(
+-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+-                    .setSupported(true)
+-                    .setServerClientId("YOUR_WEB_CLIENT_ID") // Firebase 콘솔에서 가져온 Web Client ID 입력
+-                    .setFilterByAuthorizedAccounts(false)
+-                    .build()
+-            )
+-            .build()
+-    }
+-
+-    fun signInWithGoogle(activity: Activity, onResult: (Boolean, Boolean, String?) -> Unit) {
+-        viewModelScope.launch {
+-            try {
+-                val signInIntent = oneTapClient.beginSignIn(signInRequest).result.pendingIntent.intentSender
+-                activity.startIntentSenderForResult(
+-                    signInIntent, GOOGLE_SIGN_IN, null, 0, 0, 0, null
+-                )
+-            } catch (e: Exception) {
+-                Log.e("GoogleSignIn", "Google Sign-In Failed", e)
+-                onResult(false, false, e.localizedMessage)
+-            }
+-        }
+-    }
+-
+-    fun handleSignInResult(data: Intent?, onResult: (Boolean, Boolean, String?) -> Unit) {
+-        val googleCredential = Identity.getSignInClient(data!!.context).getSignInCredentialFromIntent(data)
+-        val googleIdToken = googleCredential.googleIdToken
+-
+-        if (googleIdToken != null) {
+-            val credential = GoogleAuthProvider.getCredential(googleIdToken, null)
+-            auth.signInWithCredential(credential)
+-                .addOnCompleteListener { task ->
+-                    if (task.isSuccessful) {
+-                        val isNewUser = task.result.additionalUserInfo?.isNewUser == true
+-                        onResult(true, isNewUser, null) // isNewUser = true이면 회원가입 진행
+-                    } else {
+-                        onResult(false, false, task.exception?.message)
+-                    }
+-                }
+-        } else {
+-            onResult(false, false, "Google ID Token is null")
+-        }
+-    }
+-
+-    fun signOut() {
+-        auth.signOut()
+-    }
+-
+-    companion object {
+-        const val GOOGLE_SIGN_IN = 9001
+-    }
+-}
++//
++//import android.app.Activity
++//import android.content.Intent
++//import android.util.Log
++//import androidx.lifecycle.ViewModel
++//import androidx.lifecycle.viewModelScope
++//import com.google.android.gms.auth.api.identity.BeginSignInRequest
++//import com.google.android.gms.auth.api.identity.Identity
++//import com.google.android.gms.auth.api.identity.SignInClient
++//import com.google.firebase.auth.FirebaseAuth
++//import com.google.firebase.auth.FirebaseUser
++//import com.google.firebase.auth.GoogleAuthProvider
++//import kotlinx.coroutines.launch
++//
++//class AuthViewModel : ViewModel() {
++//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
++//    private lateinit var oneTapClient: SignInClient
++//    private lateinit var signInRequest: BeginSignInRequest
++//
++//    fun getCurrentUser(): FirebaseUser? {
++//        return auth.currentUser // 자동 로그인 체크용
++//    }
++//
++//    fun initializeGoogleSignIn(activity: Activity) {
++//        oneTapClient = Identity.getSignInClient(activity)
++//
++//        signInRequest = BeginSignInRequest.builder()
++//            .setGoogleIdTokenRequestOptions(
++//                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
++//                    .setSupported(true)
++//                    .setServerClientId("YOUR_WEB_CLIENT_ID") // Firebase 콘솔에서 가져온 Web Client ID 입력
++//                    .setFilterByAuthorizedAccounts(false)
++//                    .build()
++//            )
++//            .build()
++//    }
++//
++//    fun signInWithGoogle(activity: Activity, onResult: (Boolean, Boolean, String?) -> Unit) {
++//        viewModelScope.launch {
++//            try {
++//                val signInIntent = oneTapClient.beginSignIn(signInRequest).result.pendingIntent.intentSender
++//                activity.startIntentSenderForResult(
++//                    signInIntent, GOOGLE_SIGN_IN, null, 0, 0, 0, null
++//                )
++//            } catch (e: Exception) {
++//                Log.e("GoogleSignIn", "Google Sign-In Failed", e)
++//                onResult(false, false, e.localizedMessage)
++//            }
++//        }
++//    }
++//
++//    fun handleSignInResult(data: Intent?, onResult: (Boolean, Boolean, String?) -> Unit) {
++//        val googleCredential = Identity.getSignInClient(data!!.context).getSignInCredentialFromIntent(data)
++//        val googleIdToken = googleCredential.googleIdToken
++//
++//        if (googleIdToken != null) {
++//            val credential = GoogleAuthProvider.getCredential(googleIdToken, null)
++//            auth.signInWithCredential(credential)
++//                .addOnCompleteListener { task ->
++//                    if (task.isSuccessful) {
++//                        val isNewUser = task.result.additionalUserInfo?.isNewUser == true
++//                        onResult(true, isNewUser, null) // isNewUser = true이면 회원가입 진행
++//                    } else {
++//                        onResult(false, false, task.exception?.message)
++//                    }
++//                }
++//        } else {
++//            onResult(false, false, "Google ID Token is null")
++//        }
++//    }
++//
++//    fun signOut() {
++//        auth.signOut()
++//    }
++//
++//    companion object {
++//        const val GOOGLE_SIGN_IN = 9001
++//    }
++//}

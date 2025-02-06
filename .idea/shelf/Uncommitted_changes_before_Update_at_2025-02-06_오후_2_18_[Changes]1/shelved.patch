@@ -1,0 +1,73 @@
+Index: app/src/main/java/com/ryh/suyangdaegun/AccessionActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ryh.suyangdaegun\r\n\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.material3.TextField\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.CompositionLocalProvider\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner\r\nimport androidx.lifecycle.viewmodel.compose.viewModel\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\n\r\n//@Composable\r\n//fun AccessionScreen(navController: NavHostController) {\r\n//    val viewModel: RegistrationViewModel = viewModel()\r\n//\r\n//    CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {\r\n//        NavHost(\r\n//            navController = navController,\r\n//            startDestination = \"gender\"\r\n//        ) {\r\n//            composable(\"gender\") { GenderStep(navController, viewModel) }\r\n//            composable(\"nickname\") { NicknameStep(navController, viewModel) }\r\n//            composable(\"birthdate\") { BirthdateStep(navController, viewModel) }\r\n//            composable(\"profilePicture\") { ProfilePictureStep(navController, viewModel) }\r\n//            composable(\"interests\") { InterestsStep(navController, viewModel) }\r\n//            composable(\"complete\") {\r\n//                CompleteStep(navController, viewModel)\r\n//            }\r\n//        }\r\n//    }\r\n//}\r\n\r\n\r\n@Composable\r\nfun GenderStep(navController: NavHostController, viewModel: RegistrationViewModel) {\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"성별을 선택하세요\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = {\r\n            viewModel.setGender(\"남성\")\r\n            navController.navigate(\"nickname\")\r\n        }) {\r\n            Text(\"남성\")\r\n        }\r\n\r\n        Spacer(modifier = Modifier.height(8.dp))\r\n\r\n        Button(onClick = {\r\n            viewModel.setGender(\"여성\")\r\n            navController.navigate(\"nickname\")\r\n        }) {\r\n            Text(\"여성\")\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun NicknameStep(navController: NavHostController, viewModel: RegistrationViewModel) {\r\n    var nickname by remember { mutableStateOf(\"\") }\r\n\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"닉네임을 입력하세요\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        TextField(\r\n            value = nickname,\r\n            onValueChange = { nickname = it },\r\n            label = { Text(\"닉네임\") }\r\n        )\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = {\r\n            if (nickname.isNotBlank()) {\r\n                viewModel.setNickname(nickname)\r\n                navController.navigate(\"birthdate\")\r\n            }\r\n        }) {\r\n            Text(\"다음\")\r\n        }\r\n    }\r\n}\r\n\r\n\r\n@Composable\r\nfun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewModel) {\r\n    var birthdate by remember { mutableStateOf(\"\") }\r\n\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"생년월일을 입력하세요\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        TextField(\r\n            value = birthdate,\r\n            onValueChange = { birthdate = it },\r\n            label = { Text(\"YYYY-MM-DD\") }\r\n        )\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = {\r\n            if (birthdate.isNotBlank()) {\r\n                viewModel.setBirthdate(birthdate)\r\n                navController.navigate(\"profilePicture\")\r\n            }\r\n        }) {\r\n            Text(\"다음\")\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun ProfilePictureStep(navController: NavHostController, viewModel: RegistrationViewModel) {\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"프로필 사진을 업로드하세요\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = {\r\n            viewModel.setProfilePicture(\"example_image_url\") // 임시 URL\r\n            navController.navigate(\"interests\")\r\n        }) {\r\n            Text(\"사진 업로드\")\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {\r\n    val interests = listOf(\"운동\", \"독서\", \"음악\", \"여행\")\r\n    val selectedInterests = remember { mutableStateListOf<String>() }\r\n\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"관심사를 선택하세요\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        interests.forEach { interest ->\r\n            Button(onClick = {\r\n                if (selectedInterests.contains(interest)) {\r\n                    selectedInterests.remove(interest)\r\n                } else {\r\n                    selectedInterests.add(interest)\r\n                }\r\n            }) {\r\n                Text(interest)\r\n            }\r\n        }\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = {\r\n            viewModel.setInterests(selectedInterests)\r\n            navController.navigate(\"complete\")\r\n        }) {\r\n            Text(\"다음\")\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun CompleteStep(navController: NavHostController, viewModel: RegistrationViewModel) {\r\n    Column(\r\n        modifier = Modifier.fillMaxSize(),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(\"회원가입이 완료되었습니다!\", style = MaterialTheme.typography.headlineMedium)\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        Button(onClick = {\r\n            // 최상위 NavController로 돌아가기\r\n            navController.navigate(\"login\") {\r\n                popUpTo(\"gender\") { inclusive = true }\r\n            }\r\n        }) {\r\n            Text(\"로그인 화면으로 이동\")\r\n        }\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/ryh/suyangdaegun/AccessionActivity.kt b/app/src/main/java/com/ryh/suyangdaegun/AccessionActivity.kt
+--- a/app/src/main/java/com/ryh/suyangdaegun/AccessionActivity.kt	(revision 2ef15b32381d195c8454c0c2aeb112fce17ddc80)
++++ b/app/src/main/java/com/ryh/suyangdaegun/AccessionActivity.kt	(date 1738817737245)
+@@ -48,7 +48,7 @@
+ 
+ 
+ @Composable
+-fun GenderStep(navController: NavHostController, viewModel: RegistrationViewModel) {
++fun GenderStep(navController: NavHostController) {
+     Column(
+         modifier = Modifier.fillMaxSize(),
+         verticalArrangement = Arrangement.Center,
+@@ -77,7 +77,7 @@
+ }
+ 
+ @Composable
+-fun NicknameStep(navController: NavHostController, viewModel: RegistrationViewModel) {
++fun NicknameStep(navController: NavHostController) {
+     var nickname by remember { mutableStateOf("") }
+ 
+     Column(
+@@ -110,7 +110,7 @@
+ 
+ 
+ @Composable
+-fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewModel) {
++fun BirthdateStep(navController: NavHostController) {
+     var birthdate by remember { mutableStateOf("") }
+ 
+     Column(
+@@ -142,7 +142,7 @@
+ }
+ 
+ @Composable
+-fun ProfilePictureStep(navController: NavHostController, viewModel: RegistrationViewModel) {
++fun ProfilePictureStep(navController: NavHostController) {
+     Column(
+         modifier = Modifier.fillMaxSize(),
+         verticalArrangement = Arrangement.Center,
+@@ -162,7 +162,7 @@
+ }
+ 
+ @Composable
+-fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {
++fun InterestsStep(navController: NavHostController) {
+     val interests = listOf("운동", "독서", "음악", "여행")
+     val selectedInterests = remember { mutableStateListOf<String>() }
+ 
+@@ -190,7 +190,7 @@
+         Spacer(modifier = Modifier.height(16.dp))
+ 
+         Button(onClick = {
+-            viewModel.setInterests(selectedInterests)
++
+             navController.navigate("complete")
+         }) {
+             Text("다음")
+@@ -199,7 +199,7 @@
+ }
+ 
+ @Composable
+-fun CompleteStep(navController: NavHostController, viewModel: RegistrationViewModel) {
++fun CompleteStep(navController: NavHostController) {
+     Column(
+         modifier = Modifier.fillMaxSize(),
+         verticalArrangement = Arrangement.Center,
