@@ -34,6 +34,6 @@ fun LogoutButton(navController: NavHostController) {
         auth.signOut()
         navController.navigate("login") // 로그아웃 후 로그인 화면으로 이동
     }) {
-        Text("로그아웃")
+        Text("logout")
     }
 }

@@ -36,7 +36,7 @@ fun AppNavigator(
                         )
                     },
                     onKakaoSignInClick = {
-                        // ✅ 카카오 로그인 처리 후 바로 메인 화면으로 이동
+                        // ✅ 카카오 로그인 처리 후 바로 메인 화면으로 이동sss
                         navController.navigate("main") {
                             popUpTo("login") { inclusive = true }
                         }

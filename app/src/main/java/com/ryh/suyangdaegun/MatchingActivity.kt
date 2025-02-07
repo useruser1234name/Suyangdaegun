@@ -20,7 +20,7 @@ fun MatchingScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = { navController.navigate("main") }) {
-            Text("메인 화면으로 돌아가기")
+            Text("메인 화면으로 돌아가기하죠")
         }
     }
 }

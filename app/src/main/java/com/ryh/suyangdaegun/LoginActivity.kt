@@ -158,7 +158,7 @@ fun LoginScreen(onGoogleSignInClick: () -> Unit,
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_google),
-                        contentDescription = "google icon",
+                        contentDescription = "google icons",
                         modifier = Modifier
                             .size(30.dp)
                             .padding(end = 8.dp)

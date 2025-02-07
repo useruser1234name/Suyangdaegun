@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                         onFailure = { e -> android.util.Log.e("MainActivity", "로그인 실패", e) }
                     )
                 } else {
-                    android.util.Log.e("MainActivity", "Google 로그인 취소됨")
+                    android.util.Log.e("MainActivity", "Google 로그인이 취소됨")
                 }
             }
 

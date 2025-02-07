@@ -8,6 +8,6 @@ class SuyangdaegunApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        authManager = AuthManager(this)  // ✅ Application Context 사용
+        authManager = AuthManager(this)
     }
 }
