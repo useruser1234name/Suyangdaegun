@@ -66,7 +66,7 @@ dependencies {
 
     //네비게이터
     val nav_version = "2.8.6"
-    // Jetpack Compose integrations
+    // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$nav_version")
     // Views/Fragments integration
     implementation("androidx.navigation:navigation-fragment:$nav_version")
@@ -82,17 +82,16 @@ dependencies {
     //파이어베이스
     //인증
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
-    implementation("com.google.firebase:firebase-auth")
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     //파이어스토어
-    implementation("com.google.firebases:firebase-firestore")
-    //실시간 db접근
-    implementation("com.google.firebase:firebase-database")
-    //스토리지
-    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
-    implementation ("com.google.firebase:firebase-firestore:24.7.0")
+    //실시간 db접근
+    implementation("com.google.firebase:firebase-database-ktx")
+    //스토리지
+    implementation("com.google.firebase:firebase-storage-ktx")
+
     implementation ("com.google.firebase:firebase-messaging:23.1.2")
 
 
@@ -114,4 +113,4 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
- }
+}
