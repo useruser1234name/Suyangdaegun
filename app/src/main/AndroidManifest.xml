@@ -3,7 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /><!--카메라 권한 허용-->
+
 
     <application
         android:allowBackup="true"
@@ -31,6 +39,17 @@
             android:name=".AccessionActivity"
             android:exported="true"
             android:theme="@style/Theme.Suyangdaegun"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.ryh.suyangdaegun.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
     </application>
 
 </manifest>

@@ -1,9 +1,12 @@
 package com.ryh.suyangdaegun
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -38,18 +41,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import com.ryh.suyangdaegun.RegistrationViewModel
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,9 +121,17 @@ fun GenderStep(navController: NavHostController, viewModel: RegistrationViewMode
 
         Button(
             onClick = {
-                viewModel.setGender("남성")
-                navController.navigate("nickname")
-            }, modifier = Modifier
+                if (viewModel.gender.isBlank()) {
+                    viewModel.setGender("남성") // 성별 설정
+                }
+                Log.d("GenderStep", "성별 저장 완료: ${viewModel.gender}")
+
+                // 중복 네비게이션 방지
+                if (navController.currentDestination?.route != "nickname") {
+                    navController.navigate("nickname")
+                }
+            },
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),
             shape = RoundedCornerShape(20.dp),
@@ -145,9 +163,17 @@ fun GenderStep(navController: NavHostController, viewModel: RegistrationViewMode
 
         Button(
             onClick = {
-                viewModel.setGender("여성")
-                navController.navigate("nickname")
-            }, modifier = Modifier
+                if (viewModel.gender.isBlank()) {
+                    viewModel.setGender("남성") // 성별 설정
+                }
+                Log.d("GenderStep", "성별 저장 완료: ${viewModel.gender}")
+
+                // 중복 네비게이션 방지
+                if (navController.currentDestination?.route != "nickname") {
+                    navController.navigate("nickname")
+                }
+            },
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),
             shape = RoundedCornerShape(20.dp),
@@ -235,11 +261,39 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
     var birthtime by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Photo Picker 등록
+    val context = LocalContext.current
+
+    // 사진 촬영용 임시 파일 생성 함수
+    fun createImageFile(context: Context): Uri {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val file = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+        return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    }
+
+    // 임시 사진 저장 URI 생성
+    val tempImageUri = remember { createImageFile(context) }
+
+    // PhotoPicker 등록 (갤러리에서 사진 선택)
     val pickMedia = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        selectedImageUri = uri // URI 저장
+        if (uri != null) {
+            selectedImageUri = uri
+        }
+    }
+
+    // 사진 촬영 Launcher
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            selectedImageUri = tempImageUri
+            Log.d("Camera", "사진 촬영 성공: $selectedImageUri")
+        } else {
+            Log.e("Camera", "사진 촬영 실패")
+            Toast.makeText(context, "사진 촬영 실패", Toast.LENGTH_SHORT).show()
+        }
     }
 
     Column(
@@ -265,16 +319,33 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 사진 선택 버튼
         Button(
             onClick = {
-                // ✅ PickVisualMediaRequest를 명시적으로 전달
-                pickMedia.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("사진 선택")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 사진 촬영 버튼
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // 갤러리에서 사진 선택
+            Button(onClick = {
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }) {
+                Text("갤러리에서 선택")
+            }
+
+            // 카메라로 사진 촬영
+            Button(onClick = {
+                takePictureLauncher.launch(tempImageUri)
+            }) {
+                Text("사진 촬영")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -282,11 +353,9 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
         // 선택된 이미지 미리보기
         selectedImageUri?.let { uri ->
             Text("선택된 사진:", style = MaterialTheme.typography.bodyMedium)
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Image(
-                painter = rememberAsyncImagePainter(model = uri),
+                painter = rememberAsyncImagePainter(uri),
                 contentDescription = "Selected Image",
                 modifier = Modifier
                     .size(150.dp)
@@ -302,6 +371,8 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
                 viewModel.setProfilePicture(selectedImageUri.toString())
                 viewModel.setBirthdate(birthdate)
                 navController.navigate("profilePicture")
+            } else {
+                Toast.makeText(context, "생년월일과 사진을 입력해주세요.", Toast.LENGTH_SHORT).show()
             }
         }) {
             Text("다음")

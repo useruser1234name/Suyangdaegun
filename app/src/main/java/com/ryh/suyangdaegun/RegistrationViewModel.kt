@@ -25,8 +25,15 @@ class RegistrationViewModel : ViewModel() {
 
     // 정보 설정 메서드
     fun setGender(newGender: String) {
-        if (newGender.isNotBlank()) gender = newGender
+        if (newGender.isNotBlank()) {
+            gender = newGender
+            Log.d("RegistrationViewModel", "성별 설정 완료: $gender") // 로그 추가
+        } else {
+            Log.e("RegistrationViewModel", "성별 값이 비어 있습니다.")
+        }
     }
+
+
 
     fun setNickname(newNickname: String) {
         if (newNickname.isNotBlank()) nickname = newNickname
@@ -50,11 +57,18 @@ class RegistrationViewModel : ViewModel() {
 
     // Firestore에 사용자 데이터 저장
     fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        val uid = auth.currentUser?.uid
+        val uid = auth.currentUser?.uid ?: return
+
         if (uid == null) {
             onFailure(Exception("Firebase UID를 가져오지 못했습니다."))
             return
         }
+
+        if (gender.isBlank() || nickname.isBlank() || birthdate.isBlank()) {
+            onFailure(Exception("필수 정보가 누락되었습니다."))
+            return
+        }
+
 
         val userData = hashMapOf(
             "uid" to uid, // UID 추가
