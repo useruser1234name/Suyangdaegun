@@ -28,6 +28,7 @@ fun MatchingScreenPreview() {
 }
 
 
+
 @Composable
 fun MatchingScreen(navController: NavHostController) {
     Column(
@@ -39,7 +40,7 @@ fun MatchingScreen(navController: NavHostController) {
     ) {
 
         Text(
-            "홈",
+            "인연",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 22.dp)
@@ -51,94 +52,19 @@ fun MatchingScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(290.dp)
-                    .width(360.dp)
-                    .clip(RoundedCornerShape(20.dp))
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.img_1),
-                    contentDescription = "이미지 설명",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop  // 이미지 크기 조절 방식
-                )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
+        Image(
+            painter = painterResource(id = R.drawable.coupang),
+            contentDescription = "광고배너",
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(400.dp)
+                .height(113.dp)
+                .padding(horizontal = 22.dp),
+            contentScale = ContentScale.FillWidth
+        )
 
-            Box(
-                modifier = Modifier
-                    .height(290.dp)
-                    .width(360.dp)
-            ) {/*사진 불러오는 로직
-            AsyncImage(
-            model = "https://example.com/image.jpg",
-            contentDescription = "이미지 설명",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )*/
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
 
-            Box(
-                modifier = Modifier
-                    .height(290.dp)
-                    .width(360.dp)
-            ) {/*사진 불러오는 로직
-            AsyncImage(
-            model = "https://example.com/image.jpg",
-            contentDescription = "이미지 설명",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )*/
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Box(
-                modifier = Modifier
-                    .height(290.dp)
-                    .width(360.dp)
-            ) {/*사진 불러오는 로직
-            AsyncImage(
-            model = "https://example.com/image.jpg",
-            contentDescription = "이미지 설명",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )*/
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Box(
-                modifier = Modifier
-                    .height(290.dp)
-                    .width(360.dp)
-            ) {/*사진 불러오는 로직
-            AsyncImage(
-            model = "https://example.com/image.jpg",
-            contentDescription = "이미지 설명",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )*/
-            }
-
-            Button(
-                onClick = { navController.navigate("main") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2D3A31)
-                )
-            ) {
-                Text("궁합이 딱 맞는 친구 더보기", fontSize = 28.sp)
-            }
         }
     }
-}
