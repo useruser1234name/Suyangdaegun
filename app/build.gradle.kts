@@ -86,11 +86,15 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     //파이어스토어
-    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebases:firebase-firestore")
     //실시간 db접근
     implementation("com.google.firebase:firebase-database")
     //스토리지
     implementation("com.google.firebase:firebase-storage")
+
+    implementation ("com.google.firebase:firebase-firestore:24.7.0")
+    implementation ("com.google.firebase:firebase-messaging:23.1.2")
+
 
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
