@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.ryh.suyangdaegun.auth.AuthManager
 
 class MainActivity : ComponentActivity() {
@@ -97,6 +98,7 @@ fun MainPreview() {
 
 @Composable
 fun MainScreen(navController: NavHostController) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()

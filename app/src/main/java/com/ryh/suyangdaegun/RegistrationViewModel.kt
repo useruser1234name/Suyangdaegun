@@ -84,11 +84,11 @@ class RegistrationViewModel : ViewModel() {
         db.collection("users").document(uid)
             .set(userData)
             .addOnSuccessListener {
-                Log.d("RegistrationViewModel", "유저 데이터 저장 성공했습니다")
+                Log.d("RegistrationViewModel", "유저 데이터 저장 성공")
                 onSuccess()
             }
             .addOnFailureListener {
-                Log.e("RegistrationViewModel", "유저 데이터 저장 실패했습니다", it)
+                Log.e("RegistrationViewModel", "유저 데이터 저장 실패", it)
                 onFailure(it)
             }
     }

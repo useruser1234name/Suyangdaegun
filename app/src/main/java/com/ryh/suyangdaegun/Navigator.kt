@@ -48,7 +48,11 @@ fun AppNavigator(
             composable("main") { MainScreen(navController) }
             composable("matching") { MatchingScreen(navController) }
             composable("chatList") { ChatListScreen(navController) }
-            composable("chatting") { ChattingScreen(navController) }
+            composable("chatting") {
+                val chatViewModel: ChatViewModel = viewModel() // ✅ ViewModel 생성
+                ChattingScreen(navController, chatViewModel) // ✅ ChattingScreen에 ViewModel 전달
+            }
+
             composable("myPage") { MyPageScreen(navController) }
             composable("faceAnalysis") { FaceAnalysisScreen(navController) }
 

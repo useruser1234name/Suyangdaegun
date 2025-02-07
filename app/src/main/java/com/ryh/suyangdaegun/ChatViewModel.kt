@@ -13,18 +13,14 @@ class ChatViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> get() = _messages
-    val currentUserUID: String = auth.currentUser?.uid.orEmpty()
 
-    private val chatRoomId = "sampleChatRoom" // 채팅방 ID (예: 특정 사용자와의 고유한 ID)
+    private val chatRoomId = "exampleChatRoomId" // 고유 채팅방 ID
 
     init {
         loadMessages()
     }
 
-    /**
-     * Firestore에서 메시지를 실시간으로 가져오는 함수
-     */
-    private fun loadMessages() {
+    fun loadMessages() {
         firestore.collection("chatRooms")
             .document(chatRoomId)
             .collection("messages")
@@ -34,25 +30,18 @@ class ChatViewModel : ViewModel() {
                     Log.e("ChatViewModel", "Error loading messages: ${e.message}")
                     return@addSnapshotListener
                 }
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val newMessages = snapshot.documents.map { document ->
-                        document.toObject(ChatMessage::class.java) ?: ChatMessage()
-                    }
+
+                if (snapshot != null) {
+                    val newMessages = snapshot.documents.map { it.toObject(ChatMessage::class.java)!! }
                     _messages.value = newMessages
                 }
             }
     }
 
-
-    /**
-     * Firestore에 메시지를 저장하는 함수
-     */
     fun sendMessage(content: String) {
         val message = ChatMessage(
-            sender = currentUserUID,
-            content = content,
-            isRead = false,
-            timestamp = System.currentTimeMillis()
+            sender = auth.currentUser?.uid ?: "",
+            content = content
         )
 
         firestore.collection("chatRooms")
@@ -60,33 +49,26 @@ class ChatViewModel : ViewModel() {
             .collection("messages")
             .add(message)
             .addOnSuccessListener {
-            Log.d("ChatViewModel", "Message sent successfully")
-        }
+                Log.d("ChatViewModel", "Message sent")
+            }
             .addOnFailureListener { e ->
                 Log.e("ChatViewModel", "Error sending message: ${e.message}")
             }
     }
 
-    /**
-     * 메시지를 읽음 상태로 업데이트
-     */
     fun markMessagesAsRead() {
-        val batch = firestore.batch()
         firestore.collection("chatRooms")
             .document(chatRoomId)
             .collection("messages")
             .whereEqualTo("isRead", false)
-            .whereNotEqualTo("sender", currentUserUID)
+            .whereNotEqualTo("sender", auth.currentUser?.uid)
             .get()
             .addOnSuccessListener { snapshot ->
+                val batch = firestore.batch()
                 for (doc in snapshot.documents) {
-                    doc.reference.update("isRead", true)
+                    batch.update(doc.reference, "isRead", true)
                 }
                 batch.commit()
             }
-            .addOnFailureListener { e ->
-                Log.e("ChatViewModel", "Error updating read status: ${e.message}")
-            }
     }
-
 }
