@@ -1,6 +1,8 @@
 package com.ryh.suyangdaegun
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,13 +54,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun navigateToAccession(uid: String) {
-        val intent = android.content.Intent(this, AccessionActivity::class.java).apply {
+    private fun navigateToAccession(uid: String?) {
+        if (uid.isNullOrEmpty()) {
+            Log.e("MainActivity", "회원가입 화면으로 이동하려 했으나 UID가 없음")
+            return
+        }
+
+        val intent = Intent(this, AccessionActivity::class.java).apply {
             putExtra("uid", uid)
         }
         startActivity(intent)
         finish()
     }
+
 }
 
 

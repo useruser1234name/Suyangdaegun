@@ -66,15 +66,28 @@ class AuthManager(private val activity: SuyangdaegunApp) {
         }
     }
 
+
     private fun checkUserExists(
         uid: String,
         onSuccess: (Boolean, String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        if (uid.isEmpty()) {
+            onFailure(Exception("UID가 빈 값으로 전달됨"))
+            return
+        }
+
         db.collection("users").document(uid).get()
             .addOnSuccessListener { document ->
-                onSuccess(document.exists(), uid)
+                if (document.exists()) {
+                    onSuccess(true, uid)
+                } else {
+                    onSuccess(false, uid)
+                }
             }
-            .addOnFailureListener { onFailure(it) }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
     }
+
 }

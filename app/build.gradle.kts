@@ -105,4 +105,9 @@ dependencies {
     implementation ("androidx.compose.material3:material3:1.1.0")
     implementation ("androidx.activity:activity-compose:1.6.1")
 
+    //ActiveX
+    implementation ("androidx.activity:activity:1.6.0")
+
+    //Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
  }

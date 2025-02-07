@@ -1,11 +1,16 @@
 package com.ryh.suyangdaegun
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,12 +48,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ryh.suyangdaegun.auth.RegistrationViewModel
+import coil3.compose.rememberAsyncImagePainter
+import com.ryh.suyangdaegun.RegistrationViewModel
 
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val uid = intent.getStringExtra("uid") ?: ""
+        val uid = intent.getStringExtra("uid")
+
+        if (uid.isNullOrEmpty()) {
+            Log.e("AccessionActivity", "UID가 전달되지 않음, 회원가입 화면을 닫지 않고 대기")
+            return
+        }
+
+        Log.d("AccessionActivity", "회원가입 시작: uid=$uid")
 
         setContent {
             val navController = rememberNavController()
@@ -62,6 +76,7 @@ class AccessionActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
 fun AccessionNavGraph(uid: String, navController: NavHostController, onComplete: () -> Unit) {
     val viewModel: RegistrationViewModel = viewModel()
@@ -75,7 +90,6 @@ fun AccessionNavGraph(uid: String, navController: NavHostController, onComplete:
         composable("complete") { CompleteStep(onComplete, viewModel) }
     }
 }
-
 
 
 @Composable
@@ -95,12 +109,13 @@ fun GenderStep(navController: NavHostController, viewModel: RegistrationViewMode
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        Button(onClick = {
-            viewModel.setGender("남성")
-            navController.navigate("nickname")
-        }, modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
+        Button(
+            onClick = {
+                viewModel.setGender("남성")
+                navController.navigate("nickname")
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFF5F5F8)
@@ -128,12 +143,13 @@ fun GenderStep(navController: NavHostController, viewModel: RegistrationViewMode
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = {
-            viewModel.setGender("여성")
-            navController.navigate("nickname")
-        }, modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
+        Button(
+            onClick = {
+                viewModel.setGender("여성")
+                navController.navigate("nickname")
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFF5F5F8)
@@ -163,36 +179,68 @@ fun NicknameStep(navController: NavHostController, viewModel: RegistrationViewMo
     var nickname by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top
     ) {
-        Text("닉네임을 입력하세요", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(150.dp))
+
+        Text("이름을 입력해 주세요.", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+        Text("본명을 사용해보세요 ", fontSize = 16.sp)
+        Text("실제 이름이 사용자에게 더 매력적입니다.", fontSize = 16.sp)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
             value = nickname,
             onValueChange = { nickname = it },
-            label = { Text("닉네임") }
+            label = { Text("닉네임") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(30.dp)
+                )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(443.dp))
 
-        Button(onClick = {
-            if (nickname.isNotBlank()) {
-                viewModel.setNickname(nickname)
-                navController.navigate("birthdate")
-            }
-        }) {
-            Text("다음")
+        Button(
+            onClick = {
+                if (nickname.isNotBlank()) {
+                    viewModel.setNickname(nickname)
+                    navController.navigate("birthdate")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2D3A31)
+            )
+        ) {
+            Text("다음", fontSize = 28.sp)
         }
     }
 }
 
 
+
 @Composable
 fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewModel) {
     var birthdate by remember { mutableStateOf("") }
+    var birthtime by remember { mutableStateOf("") }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Photo Picker 등록
+    val pickMedia = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        selectedImageUri = uri // URI 저장
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -200,6 +248,7 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("생년월일을 입력하세요", style = MaterialTheme.typography.headlineMedium)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
@@ -208,10 +257,49 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
             label = { Text("YYYY-MM-DD") }
         )
 
+        TextField(
+            value = birthtime,
+            onValueChange = { birthtime = it },
+            label = { Text("TT-MM") }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                // ✅ PickVisualMediaRequest를 명시적으로 전달
+                pickMedia.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("사진 선택")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 선택된 이미지 미리보기
+        selectedImageUri?.let { uri ->
+            Text("선택된 사진:", style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Image(
+                painter = rememberAsyncImagePainter(model = uri),
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(8.dp),
+                contentScale = ContentScale.Crop
+            )
+        } ?: Text("선택된 사진이 없습니다.", style = MaterialTheme.typography.bodySmall)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            if (birthdate.isNotBlank()) {
+            if (birthdate.isNotBlank() && selectedImageUri != null) {
+                viewModel.setProfilePicture(selectedImageUri.toString())
                 viewModel.setBirthdate(birthdate)
                 navController.navigate("profilePicture")
             }

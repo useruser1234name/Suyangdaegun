@@ -1,5 +1,6 @@
-package com.ryh.suyangdaegun.auth
+package com.ryh.suyangdaegun
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,6 +16,8 @@ class RegistrationViewModel : ViewModel() {
         private set
     var birthdate: String = ""
         private set
+    var birthtime: String = ""
+        private set
     var profilePicture: String = ""
         private set
     var interests: List<String> = listOf()
@@ -22,39 +25,57 @@ class RegistrationViewModel : ViewModel() {
 
     // 정보 설정 메서드
     fun setGender(newGender: String) {
-        gender = newGender
+        if (newGender.isNotBlank()) gender = newGender
     }
 
     fun setNickname(newNickname: String) {
-        nickname = newNickname
+        if (newNickname.isNotBlank()) nickname = newNickname
     }
 
     fun setBirthdate(newBirthdate: String) {
-        birthdate = newBirthdate
+        if (newBirthdate.isNotBlank()) birthdate = newBirthdate
+    }
+
+    fun setBirthtime(newBirthtime: String) {
+        if (newBirthtime.isNotBlank()) birthtime = newBirthtime
     }
 
     fun setProfilePicture(newProfilePicture: String) {
-        profilePicture = newProfilePicture
+        if (newProfilePicture.isNotBlank()) profilePicture = newProfilePicture
     }
 
     fun setInterests(newInterests: List<String>) {
-        interests = newInterests
+        if (newInterests.isNotEmpty()) interests = newInterests
     }
 
-    // ✅ Firestore에 사용자 데이터 저장
+    // Firestore에 사용자 데이터 저장
     fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        val uid = auth.currentUser?.uid ?: return // ✅ UID 가져오기
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            onFailure(Exception("Firebase UID를 가져오지 못했습니다."))
+            return
+        }
+
         val userData = hashMapOf(
-            "gender" to gender,
-            "nickname" to nickname,
-            "birthdate" to birthdate,
-            "profilePicture" to profilePicture,
-            "interests" to interests
+            "uid" to uid, // UID 추가
+            "email" to auth.currentUser?.email.orEmpty(), // 이메일 추가
+            "gender" to gender.ifEmpty { "미설정" },
+            "nickname" to nickname.ifEmpty { "미설정" },
+            "birthdate" to birthdate.ifEmpty { "미설정" },
+            "birthtime" to birthtime.ifEmpty { "미설정" },
+            "profilePicture" to profilePicture.ifEmpty { "미설정" },
+            "interests" to if (interests.isNotEmpty()) interests else listOf("미설정")
         )
 
         db.collection("users").document(uid)
             .set(userData)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
+            .addOnSuccessListener {
+                Log.d("RegistrationViewModel", "유저 데이터 저장 성공")
+                onSuccess()
+            }
+            .addOnFailureListener {
+                Log.e("RegistrationViewModel", "유저 데이터 저장 실패", it)
+                onFailure(it)
+            }
     }
 }

@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ryh.suyangdaegun.auth.AuthManager
-import com.ryh.suyangdaegun.auth.RegistrationViewModel
+import com.ryh.suyangdaegun.RegistrationViewModel
 
 @Composable
 fun AppNavigator(
