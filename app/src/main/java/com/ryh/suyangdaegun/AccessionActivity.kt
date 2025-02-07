@@ -63,6 +63,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -411,6 +413,8 @@ fun ProfilePictureStep(navController: NavHostController, viewModel: Registration
 fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {
     val interests = listOf("운동", "독서", "음악", "여행")
     val selectedInterests = remember { mutableStateListOf<String>() }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -434,10 +438,31 @@ fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewM
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
-            viewModel.setInterests(selectedInterests)
-            navController.navigate("complete")
-        }) {
+        Button(
+            onClick = {
+                scope.launch {
+                    try {
+                        val userData = ApiService.UserData(
+                            birthdate = viewModel.birthdate,
+                            gender = viewModel.gender,
+                            interests = selectedInterests.toList(),
+                            nickname = viewModel.nickname
+                        )
+
+                        ApiService.sendUserData(userData)
+                        viewModel.setInterests(selectedInterests)
+                        navController.navigate("complete")
+
+                    } catch (e: Exception) {
+                        android.widget.Toast.makeText(
+                            context,
+                            "서버 전송 실패: ${e.message}",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        ) {
             Text("다음")
         }
     }

@@ -113,4 +113,7 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+
+    //okhttp
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0")
 }
