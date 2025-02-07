@@ -2,6 +2,7 @@ package com.ryh.suyangdaegun
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -46,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,6 +62,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.Manifest
 
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -260,7 +263,6 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
     var birthdate by remember { mutableStateOf("") }
     var birthtime by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
     val context = LocalContext.current
 
     // 사진 촬영용 임시 파일 생성 함수
@@ -271,8 +273,8 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
 
-    // 임시 사진 저장 URI 생성
-    val tempImageUri = remember { createImageFile(context) }
+    // 임시 저장 URI
+    var tempImageUri by remember { mutableStateOf(createImageFile(context)) }
 
     // PhotoPicker 등록 (갤러리에서 사진 선택)
     val pickMedia = rememberLauncherForActivityResult(
@@ -283,18 +285,28 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
         }
     }
 
-    // 사진 촬영 Launcher
+    // 사진 촬영 Launcher 결과 처리
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             selectedImageUri = tempImageUri
-            Log.d("Camera", "사진 촬영 성공: $selectedImageUri")
         } else {
-            Log.e("Camera", "사진 촬영 실패")
             Toast.makeText(context, "사진 촬영 실패", Toast.LENGTH_SHORT).show()
         }
     }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            tempImageUri = createImageFile(context) // 새로운 파일 생성
+            takePictureLauncher.launch(tempImageUri) // 촬영 실행
+        } else {
+            Toast.makeText(context, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -320,15 +332,6 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
         Spacer(modifier = Modifier.height(16.dp))
 
         // 사진 선택 버튼
-        Button(
-            onClick = {
-                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("사진 선택")
-        }
-
         Spacer(modifier = Modifier.height(8.dp))
 
         // 사진 촬영 버튼
@@ -342,21 +345,26 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
 
             // 카메라로 사진 촬영
             Button(onClick = {
-                takePictureLauncher.launch(tempImageUri)
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                    tempImageUri = createImageFile(context) // 새로운 파일 생성
+                    takePictureLauncher.launch(tempImageUri) // 촬영 실행
+                } else {
+                    permissionLauncher.launch(Manifest.permission.CAMERA) // 권한 요청
+                }
             }) {
                 Text("사진 촬영")
             }
         }
 
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // 선택된 이미지 미리보기
         selectedImageUri?.let { uri ->
-            Text("선택된 사진:", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(8.dp))
             Image(
                 painter = rememberAsyncImagePainter(uri),
-                contentDescription = "Selected Image",
+                contentDescription = "Captured Image",
                 modifier = Modifier
                     .size(150.dp)
                     .padding(8.dp),
