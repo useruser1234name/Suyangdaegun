@@ -1,3 +1,4 @@
+// AccessionActivity.kt
 package com.ryh.suyangdaegun
 
 import android.content.Context
@@ -15,16 +16,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,12 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,35 +38,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
-import com.ryh.suyangdaegun.RegistrationViewModel
+import com.ryh.suyangdaegun.auth.AuthManager
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import android.Manifest
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
+import java.util.*
 
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val uid = intent.getStringExtra("uid")
-
         if (uid.isNullOrEmpty()) {
             Log.e("AccessionActivity", "UID가 전달되지 않음, 회원가입 화면을 닫지 않고 대기")
             return
         }
-
         Log.d("AccessionActivity", "회원가입 시작: uid=$uid")
-
         setContent {
             val navController = rememberNavController()
             AccessionNavGraph(uid, navController) { navigateToMain() }
@@ -91,208 +70,168 @@ class AccessionActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun AccessionNavGraph(uid: String, navController: NavHostController, onComplete: () -> Unit) {
-    val viewModel: RegistrationViewModel = viewModel()
-
+    val viewModel: RegistrationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    // 등록 순서: gender → nickname → interests → birthdate → complete
     NavHost(navController = navController, startDestination = "gender") {
         composable("gender") { GenderStep(navController, viewModel) }
         composable("nickname") { NicknameStep(navController, viewModel) }
-        composable("birthdate") { BirthdateStep(navController, viewModel) }
-        composable("profilePicture") { ProfilePictureStep(navController, viewModel) }
         composable("interests") { InterestsStep(navController, viewModel) }
-        composable("complete") { CompleteStep(onComplete, viewModel) }
+        composable("birthdate") { BirthdateStep(navController, viewModel) }
+        composable("complete") {
+            CompleteStep(onComplete = { onComplete() }, viewModel = viewModel)
+        }
     }
 }
 
+// 각 단계의 Composable 함수는 아래와 같이 구성합니다.
 
 @Composable
 fun GenderStep(navController: NavHostController, viewModel: RegistrationViewModel) {
-
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-
-        ) {
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Top
+    ) {
         Spacer(modifier = Modifier.height(150.dp))
-
         Text("안녕하세요 정보를 입력해주세요.", fontWeight = FontWeight.Bold, fontSize = 30.sp)
         Text("프로필을 만들고 바로 커뮤니케이션을 시작하는 데 도움이 되는 간단한 정보를 알려주세요.", fontSize = 16.sp)
-
         Spacer(modifier = Modifier.height(30.dp))
-
         Button(
             onClick = {
-                if (viewModel.gender.isBlank()) {
-                    viewModel.setGender("남성") // 성별 설정
-                }
-                Log.d("GenderStep", "성별 저장 완료: ${viewModel.gender}")
-
-                // 중복 네비게이션 방지
-                if (navController.currentDestination?.route != "nickname") {
-                    navController.navigate("nickname")
-                }
+                viewModel.setGender("남성")
+                navController.navigate("nickname")
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
+            modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFF5F5F8)
-            )
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.man),
-                    contentDescription = "Kakao icon",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .padding(end = 8.dp)
-                )
-                Spacer(modifier = Modifier.width(110.dp))
-
-                Text("남성입니다", color = Color.Black)
-            }
+            Image(
+                painter = painterResource(id = R.drawable.man),
+                contentDescription = "남성 아이콘",
+                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+            )
+            Spacer(modifier = Modifier.width(110.dp))
+            Text("남성입니다", color = Color.Black)
         }
-
         Spacer(modifier = Modifier.height(23.dp))
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         Button(
             onClick = {
-                if (viewModel.gender.isBlank()) {
-                    viewModel.setGender("남성") // 성별 설정
-                }
-                Log.d("GenderStep", "성별 저장 완료: ${viewModel.gender}")
-
-                // 중복 네비게이션 방지
-                if (navController.currentDestination?.route != "nickname") {
-                    navController.navigate("nickname")
-                }
+                viewModel.setGender("여성")
+                navController.navigate("nickname")
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
+            modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFF5F5F8)
-            )
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.woman),
-                    contentDescription = "Kakao icon",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .padding(end = 8.dp)
-                )
-                Spacer(modifier = Modifier.width(110.dp))
-                Text("여성입니다", color = Color.Black)
-            }
+            Image(
+                painter = painterResource(id = R.drawable.woman),
+                contentDescription = "여성 아이콘",
+                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+            )
+            Spacer(modifier = Modifier.width(110.dp))
+            Text("여성입니다", color = Color.Black)
         }
     }
 }
 
 @Composable
 fun NicknameStep(navController: NavHostController, viewModel: RegistrationViewModel) {
-    var nickname by remember { mutableStateOf("") }
-
+    var nickname = remember { mutableStateOf("") }
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
         Spacer(modifier = Modifier.height(150.dp))
-
         Text("이름을 입력해 주세요.", fontWeight = FontWeight.Bold, fontSize = 30.sp)
-        Text("본명을 사용해보세요 ", fontSize = 16.sp)
-        Text("실제 이름이 사용자에게 더 매력적입니다.", fontSize = 16.sp)
-
+        Text("본명을 사용해보세요. 실제 이름이 사용자에게 더 매력적입니다.", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(16.dp))
-
         TextField(
-            value = nickname,
-            onValueChange = { nickname = it },
+            value = nickname.value,
+            onValueChange = { nickname.value = it },
             label = { Text("닉네임") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = Color.Gray,
-                    shape = RoundedCornerShape(30.dp)
-                )
+            modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray, RoundedCornerShape(30.dp))
         )
-
         Spacer(modifier = Modifier.height(443.dp))
-
         Button(
             onClick = {
-                if (nickname.isNotBlank()) {
-                    viewModel.setNickname(nickname)
-                    navController.navigate("birthdate")
+                if (nickname.value.isNotBlank()) {
+                    viewModel.setNickname(nickname.value)
+                    navController.navigate("interests")
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
+            modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2D3A31)
-            )
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
         ) {
             Text("다음", fontSize = 28.sp)
         }
     }
 }
 
-
+@Composable
+fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {
+    val interests = listOf("운동", "독서", "음악", "여행")
+    val selectedInterests = remember { mutableStateListOf<String>() }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("관심사를 선택하세요", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(16.dp))
+        interests.forEach { interest ->
+            Button(onClick = {
+                if (selectedInterests.contains(interest))
+                    selectedInterests.remove(interest)
+                else
+                    selectedInterests.add(interest)
+            }) {
+                Text(interest)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                if (selectedInterests.isNotEmpty()) {
+                    viewModel.setInterests(selectedInterests.toList())
+                    navController.navigate("birthdate")
+                }
+            }
+        ) {
+            Text("다음")
+        }
+    }
+}
 
 @Composable
 fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewModel) {
-    var birthdate by remember { mutableStateOf("") }
-    var birthtime by remember { mutableStateOf("") }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var birthdate = remember { mutableStateOf("") }
+    var birthtime = remember { mutableStateOf("") }
+    var selectedImageUri = remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
 
-    // 사진 촬영용 임시 파일 생성 함수
     fun createImageFile(context: Context): Uri {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val file = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
 
-    // 임시 저장 URI
-    var tempImageUri by remember { mutableStateOf(createImageFile(context)) }
+    var tempImageUri = remember { mutableStateOf(createImageFile(context)) }
 
-    // PhotoPicker 등록 (갤러리에서 사진 선택)
     val pickMedia = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        if (uri != null) {
-            selectedImageUri = uri
-        }
+        if (uri != null) selectedImageUri.value = uri
     }
 
-    // 사진 촬영 Launcher 결과 처리
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            selectedImageUri = tempImageUri
+            selectedImageUri.value = tempImageUri.value
         } else {
             Toast.makeText(context, "사진 촬영 실패", Toast.LENGTH_SHORT).show()
         }
@@ -302,167 +241,69 @@ fun BirthdateStep(navController: NavHostController, viewModel: RegistrationViewM
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            tempImageUri = createImageFile(context) // 새로운 파일 생성
-            takePictureLauncher.launch(tempImageUri) // 촬영 실행
+            tempImageUri.value = createImageFile(context)
+            takePictureLauncher.launch(tempImageUri.value)
         } else {
             Toast.makeText(context, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("생년월일을 입력하세요", style = MaterialTheme.typography.headlineMedium)
-
+        Text("생년월일을 입력하세요", fontSize = 20.sp)
         Spacer(modifier = Modifier.height(16.dp))
-
         TextField(
-            value = birthdate,
-            onValueChange = { birthdate = it },
+            value = birthdate.value,
+            onValueChange = { birthdate.value = it },
             label = { Text("YYYY-MM-DD") }
         )
-
         TextField(
-            value = birthtime,
-            onValueChange = { birthtime = it },
-            label = { Text("TT-MM") }
+            value = birthtime.value,
+            onValueChange = { birthtime.value = it },
+            label = { Text("HH:MM") }
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // 사진 선택 버튼
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // 사진 촬영 버튼
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            // 갤러리에서 사진 선택
             Button(onClick = {
                 pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             }) {
                 Text("갤러리에서 선택")
             }
-
-            // 카메라로 사진 촬영
             Button(onClick = {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                    tempImageUri = createImageFile(context) // 새로운 파일 생성
-                    takePictureLauncher.launch(tempImageUri) // 촬영 실행
+                if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    tempImageUri.value = createImageFile(context)
+                    takePictureLauncher.launch(tempImageUri.value)
                 } else {
-                    permissionLauncher.launch(Manifest.permission.CAMERA) // 권한 요청
+                    permissionLauncher.launch(android.Manifest.permission.CAMERA)
                 }
             }) {
                 Text("사진 촬영")
             }
         }
-
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // 선택된 이미지 미리보기
-        selectedImageUri?.let { uri ->
+        if (selectedImageUri.value != null) {
             Image(
-                painter = rememberAsyncImagePainter(uri),
-                contentDescription = "Captured Image",
-                modifier = Modifier
-                    .size(150.dp)
-                    .padding(8.dp),
-                contentScale = ContentScale.Crop
+                painter = rememberAsyncImagePainter(selectedImageUri.value),
+                contentDescription = "선택된 이미지",
+                modifier = Modifier.height(150.dp)
             )
-        } ?: Text("선택된 사진이 없습니다.", style = MaterialTheme.typography.bodySmall)
-
+        } else {
+            Text("선택된 사진이 없습니다.")
+        }
         Spacer(modifier = Modifier.height(16.dp))
-
         Button(onClick = {
-            if (birthdate.isNotBlank() && selectedImageUri != null) {
-                viewModel.setProfilePicture(selectedImageUri.toString())
-                viewModel.setBirthdate(birthdate)
-                navController.navigate("profilePicture")
+            if (birthdate.value.isNotBlank() && birthtime.value.isNotBlank() && selectedImageUri.value != null) {
+                viewModel.setBirthdate(birthdate.value)
+                viewModel.setBirthtime(birthtime.value)
+                viewModel.setProfilePicture(selectedImageUri.value.toString())
+                navController.navigate("complete")
             } else {
-                Toast.makeText(context, "생년월일과 사진을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
             }
         }) {
-            Text("다음")
-        }
-    }
-}
-
-@Composable
-fun ProfilePictureStep(navController: NavHostController, viewModel: RegistrationViewModel) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("프로필 사진을 업로드하세요", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            viewModel.setProfilePicture("example_image_url")
-            navController.navigate("interests")
-        }) {
-            Text("사진 업로드")
-        }
-    }
-}
-
-@Composable
-fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {
-    val interests = listOf("운동", "독서", "음악", "여행")
-    val selectedInterests = remember { mutableStateListOf<String>() }
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("관심사를 선택하세요", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        interests.forEach { interest ->
-            Button(onClick = {
-                if (selectedInterests.contains(interest)) {
-                    selectedInterests.remove(interest)
-                } else {
-                    selectedInterests.add(interest)
-                }
-            }) {
-                Text(interest)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                scope.launch {
-                    try {
-                        val userData = ApiService.UserData(
-                            birthdate = viewModel.birthdate,
-                            gender = viewModel.gender,
-                            interests = selectedInterests.toList(),
-                            nickname = viewModel.nickname
-                        )
-
-                        ApiService.sendUserData(userData)
-                        viewModel.setInterests(selectedInterests)
-                        navController.navigate("complete")
-
-                    } catch (e: Exception) {
-                        android.widget.Toast.makeText(
-                            context,
-                            "서버 전송 실패: ${e.message}",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        ) {
             Text("다음")
         }
     }
@@ -477,7 +318,6 @@ fun CompleteStep(onComplete: () -> Unit, viewModel: RegistrationViewModel) {
     ) {
         Text("회원가입 완료!", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
-
         Button(onClick = {
             viewModel.saveUserData(
                 onSuccess = { onComplete() },

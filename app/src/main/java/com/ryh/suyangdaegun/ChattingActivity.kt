@@ -1,43 +1,33 @@
+// ChattingScreen.kt
 package com.ryh.suyangdaegun
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
-    val messages by viewModel.messages.collectAsState() // ✅ 메시지 실시간 반영
+    val messages by viewModel.messages.collectAsState()
+    var input by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("채팅 화면", style = MaterialTheme.typography.headlineMedium)
-
-        // ✅ 채팅 메시지 리스트 표시
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            reverseLayout = true
-        ) {
+        Text("채팅 방", style = MaterialTheme.typography.headlineMedium)
+        LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { message ->
-                Text(
-                    text = "${message.sender}: ${message.content}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Text("${message.sender}: ${message.content}", style = MaterialTheme.typography.bodyLarge)
             }
         }
-
-        // ✅ 메시지 입력 UI
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            var input by remember { mutableStateOf("") }
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
                 value = input,
                 onValueChange = { input = it },
@@ -46,7 +36,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
             )
             Button(onClick = {
                 if (input.isNotBlank()) {
-                    viewModel.sendMessage(input) // ✅ Firebase에 메시지 전송
+                    coroutineScope.launch { viewModel.sendMessage(input) }
                     input = ""
                 }
             }) {

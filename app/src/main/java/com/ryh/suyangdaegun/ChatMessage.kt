@@ -1,3 +1,4 @@
+// ChatMessage.kt
 package com.ryh.suyangdaegun
 
 data class ChatMessage(

@@ -20,38 +20,42 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import com.ryh.suyangdaegun.auth.AuthManager
+
 
 class LoginActivity : ComponentActivity() {
     private lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // ✅ Application에서 authManager 가져오기
         authManager = (application as SuyangdaegunApp).authManager
 
-        val googleSignInLauncher =
-            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    authManager.handleSignInResult(
-                        data = result.data,
-                        onSuccess = { isExistingUser, uid ->
-                            if (isExistingUser) {
-                                navigateToMain()
-                            } else {
-                                navigateToAccession(uid)
-                            }
-                        },
-                        onFailure = { e -> Log.e("LoginActivity", "로그인 실패", e) }
-                    )
-                } else {
-                    Log.e("LoginActivity", "Google 로그인 취소됨")
-                }
+        // 이미 로그인되어 있다면 메인으로 바로 이동
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            navigateToMain()
+            return
+        }
+
+        val googleSignInLauncher = registerForActivityResult(
+            ActivityResultContracts.StartIntentSenderForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                authManager.handleSignInResult(
+                    data = result.data,
+                    onSuccess = { isExistingUser, uid ->
+                        // 로그인 성공 시 메인으로 이동
+                        navigateToMain()
+                    },
+                    onFailure = { e -> Log.e("LoginActivity", "로그인 실패", e) }
+                )
+            } else {
+                Log.e("LoginActivity", "Google 로그인 취소됨")
             }
+        }
 
         setContent {
-            AppNavigator(googleSignInLauncher, authManager)
+            AppNavigator(googleSignInLauncher = googleSignInLauncher, authManager = authManager)
         }
     }
 
@@ -60,32 +64,22 @@ class LoginActivity : ComponentActivity() {
         startActivity(intent)
         finish()
     }
-
-    private fun navigateToAccession(uid: String) {
-        val intent = Intent(this, AccessionActivity::class.java).apply {
-            putExtra("uid", uid)
-        }
-        startActivity(intent)
-        finish()
-    }
 }
 
 @Composable
-fun LoginScreen(onGoogleSignInClick: () -> Unit,
-                onKakaoSignInClick: () -> Unit) {
+fun LoginScreen(
+    onGoogleSignInClick: () -> Unit,
+    onKakaoSignInClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.White),
+            .background(Color.White),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.White)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -94,107 +88,62 @@ fun LoginScreen(onGoogleSignInClick: () -> Unit,
                 modifier = Modifier.size(width = 230.dp, height = 50.dp),
                 contentScale = ContentScale.Inside
             )
-
             Spacer(modifier = Modifier.height(20.dp))
-
             Text(text = "새로운 인연", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
         }
-
         Spacer(modifier = Modifier.height(230.dp))
-
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-            ,
-//                .fillMaxHeight(0.4f)
-//            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Button(
-                onClick = onKakaoSignInClick, // Kakao 로그인 -> 회원가입 화면
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                ,
+                onClick = onKakaoSignInClick,
+                modifier = Modifier.fillMaxWidth().height(60.dp),
                 shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFF5F5F8)
-                )
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_kakao),
                         contentDescription = "Kakao icon",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .padding(end = 8.dp)
+                        modifier = Modifier.size(30.dp).padding(end = 8.dp)
                     )
                     Spacer(modifier = Modifier.width(80.dp))
-                    Text("카카오로 로그인", color = Color.Black, fontSize = 20.sp)
-                }
-            }
-            Spacer(modifier = Modifier.height(23.dp))
-
-            Button(onClick = onGoogleSignInClick,
-                modifier = Modifier
-                    .fillMaxWidth() .height(60.dp)
-                ,
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFF5F5F8)
-                )
-            )
-            {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_google),
-                        contentDescription = "google icons",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .padding(end = 8.dp)
-                    )
-                    Spacer(modifier = Modifier.width(80.dp))
-                    Text("Google로 로그인", color = Color.Black, fontSize = 20.sp)
+                    Text("카카오로 로그인", fontSize = 20.sp, color = Color.Black)
                 }
             }
             Spacer(modifier = Modifier.height(23.dp))
             Button(
-                onClick = { }, // Naver 로그인 -> 회원가입 화면
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                ,
+                onClick = onGoogleSignInClick,
+                modifier = Modifier.fillMaxWidth().height(60.dp),
                 shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFF5F5F8)
-                )
-            )
-            {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_naver),
-                        contentDescription = "Kakao icon",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .padding(end = 8.dp)
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = "Google icon",
+                        modifier = Modifier.size(30.dp).padding(end = 8.dp)
                     )
                     Spacer(modifier = Modifier.width(80.dp))
-
-                    Text("네이버로 로그인", color = Color.Black, fontSize = 20.sp)
+                    Text("Google로 로그인", fontSize = 20.sp, color = Color.Black)
+                }
+            }
+            Spacer(modifier = Modifier.height(23.dp))
+            Button(
+                onClick = { /* 네이버 로그인 (미구현) */ },
+                modifier = Modifier.fillMaxWidth().height(60.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_naver),
+                        contentDescription = "Naver icon",
+                        modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.width(80.dp))
+                    Text("네이버로 로그인", fontSize = 20.sp, color = Color.Black)
                 }
             }
         }
