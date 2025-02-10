@@ -1,9 +1,14 @@
 package com.ryh.suyangdaegun
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 class RegistrationViewModel : ViewModel() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -55,9 +60,11 @@ class RegistrationViewModel : ViewModel() {
         if (newInterests.isNotEmpty()) interests = newInterests
     }
 
+
     // Firestore에 사용자 데이터 저장
     fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val uid = auth.currentUser?.uid ?: return
+        val storage: FirebaseStorage = FirebaseStorage.getInstance()
 
         if (uid == null) {
             onFailure(Exception("Firebase UID를 가져오지 못했습니다."))
@@ -68,8 +75,19 @@ class RegistrationViewModel : ViewModel() {
             onFailure(Exception("필수 정보가 누락되었습니다."))
             return
         }
-
-
+// 프로필 사진이 있는 경우 Storage에 업로드
+        var profilePictureUrl = profilePicture
+        if (profilePicture.isNotBlank()) {
+            val storageRef = storage.reference.child("profile_images/${auth.currentUser?.uid}")
+            val imageUri = Uri.parse(profilePicture)
+            storageRef.putFile(imageUri)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl
+                        .addOnSuccessListener { uri ->
+                            profilePictureUrl = uri.toString()
+                        }
+                }
+        }
         val userData = hashMapOf(
             "uid" to uid, // UID 추가
             "email" to auth.currentUser?.email.orEmpty(), // 이메일 추가
@@ -79,6 +97,7 @@ class RegistrationViewModel : ViewModel() {
             "birthtime" to birthtime.ifEmpty { "미설정" },
             "profilePicture" to profilePicture.ifEmpty { "미설정" },
             "interests" to if (interests.isNotEmpty()) interests else listOf("미설정")
+
         )
 
         db.collection("users").document(uid)
