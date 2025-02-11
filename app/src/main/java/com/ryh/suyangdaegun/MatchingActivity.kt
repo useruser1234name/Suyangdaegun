@@ -70,7 +70,7 @@ fun acceptMatchRequest(request: MatchRequest, navController: NavHostController) 
 
             // ✅ 채팅방 생성
             val chatRoom = mapOf(
-                "users" to listOf(request.senderUid, request.receiverUid),
+                "participants" to listOf(request.senderUid, request.receiverUid),
                 "createdAt" to System.currentTimeMillis()
             )
             firestore.collection("chat_rooms")
@@ -86,14 +86,12 @@ fun acceptMatchRequest(request: MatchRequest, navController: NavHostController) 
         }
 }
 
-
 fun rejectMatchRequest(request: MatchRequest) {
     FirebaseFirestore.getInstance().collection("match_requests")
         .document("${request.senderUid}_${request.receiverUid}") // ✅ 요청 삭제
         .delete()
         .addOnSuccessListener { Log.d("Matching", "매칭 요청 거절 완료") }
 }
-
 
 fun generateChatRoomId(request: MatchRequest): String {
     return if (request.senderUid < request.receiverUid) {

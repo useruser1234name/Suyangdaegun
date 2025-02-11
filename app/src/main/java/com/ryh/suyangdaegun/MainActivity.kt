@@ -79,6 +79,7 @@ fun MainScreen(rootNavController: androidx.navigation.NavHostController) {
                                 if (targetUid != null) {
                                     viewModel.sendMatchRequest(
                                         targetUid = targetUid,
+                                        targetEmail = targetEmail,  // ✅ targetEmail 추가
                                         onSuccess = { Log.d("Matching", "매칭 요청 성공!") },
                                         onFailure = { e -> Log.e("Matching", "매칭 요청 실패: ${e.message}") }
                                     )
@@ -94,6 +95,7 @@ fun MainScreen(rootNavController: androidx.navigation.NavHostController) {
         }
     }
 }
+
 
 
 
@@ -122,7 +124,8 @@ data class MatchRequest(
     val senderEmail: String = "",
     val receiverUid: String = "",
     val receiverEmail: String = "",
-    val status: String = "pending" // "pending", "accepted", "rejected"
+    val status: String = "pending", // "pending", "accepted", "rejected"
+    val timestamp: Long = System.currentTimeMillis()
 )
 
 class MatchingViewModel : ViewModel() {
@@ -148,20 +151,29 @@ class MatchingViewModel : ViewModel() {
     }
 
     /**
-     * 🔹 매칭 요청 전송 함수 (이제 targetUid를 직접 받음)
+     * 🔹 매칭 요청 전송 (중복 방지)
      */
-    fun sendMatchRequest(targetUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun sendMatchRequest(targetUid: String, targetEmail: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val senderUid = auth.currentUser?.uid ?: return onFailure(Exception("User not authenticated"))
         val senderEmail = auth.currentUser?.email ?: return onFailure(Exception("No email found"))
 
-        val request = MatchRequest(senderUid, senderEmail, targetUid, "pending")
+        val requestId = "${senderUid}_$targetUid"
 
-        firestore.collection("match_requests")
-            .document("${senderUid}_$targetUid") // ✅ UID 기반 저장 (중복 방지)
-            .set(request)
-            .addOnSuccessListener { onSuccess() }
+        firestore.collection("match_requests").document(requestId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    onFailure(Exception("이미 요청을 보냈습니다."))
+                } else {
+                    val request = MatchRequest(senderUid, senderEmail, targetUid, targetEmail, "pending")
+
+                    firestore.collection("match_requests")
+                        .document(requestId)
+                        .set(request)
+                        .addOnSuccessListener { onSuccess() }
+                        .addOnFailureListener { e -> onFailure(e) }
+                }
+            }
             .addOnFailureListener { e -> onFailure(e) }
     }
-
-
 }

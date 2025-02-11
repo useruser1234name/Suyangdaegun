@@ -17,14 +17,13 @@ import kotlinx.coroutines.launch
 fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
     val messages by viewModel.messages.collectAsState()
     var input by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("채팅 방", style = MaterialTheme.typography.headlineMedium)
+        Text("채팅방", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { message ->
-                Text("${message.sender}: ${message.content}")
+                Text("${message.senderId}: ${message.message}")
             }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -37,7 +36,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
                 if (input.isNotBlank()) {
-                    coroutineScope.launch { viewModel.sendMessage(input) }
+                    viewModel.sendMessage(input)
                     input = ""
                 }
             }) {
