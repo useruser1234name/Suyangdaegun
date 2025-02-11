@@ -1,6 +1,5 @@
 package com.ryh.suyangdaegun
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -26,22 +25,16 @@ class ChatViewModel(private val chatRoomId: String) : ViewModel() {
                     _messages.value += it
                 }
             }
-
+            override fun onCancelled(error: DatabaseError) {}
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("ChatViewModel", "Failed to receive messages", error.toException())
-            }
         })
     }
 
     fun sendMessage(content: String) {
         val senderId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         val message = ChatMessage(senderId, content)
-        database.child("messages").push()
-            .setValue(message)
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Message send failed", e) }
+        database.child("messages").push().setValue(message)
     }
 }

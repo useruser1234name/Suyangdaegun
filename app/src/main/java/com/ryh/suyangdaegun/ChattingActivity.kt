@@ -19,29 +19,19 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
     var input by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("채팅방", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { message ->
                 Text("${message.senderId}: ${message.message}")
             }
         }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextField(
-                value = input,
-                onValueChange = { input = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("메시지 입력") }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+        Row {
+            TextField(value = input, onValueChange = { input = it }, modifier = Modifier.weight(1f))
             Button(onClick = {
                 if (input.isNotBlank()) {
                     viewModel.sendMessage(input)
                     input = ""
                 }
-            }) {
-                Text("전송")
-            }
+            }) { Text("전송") }
         }
     }
 }
