@@ -35,7 +35,7 @@ fun ChatRoomItem(chatRoom: ChatRoom, navController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { navController.navigate("chatting/${chatRoom.chatRoomId}") },
+            .clickable { navController.navigate("chatting/${chatRoom.chatRoomId}") }, // ✅ 채팅방으로 이동
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

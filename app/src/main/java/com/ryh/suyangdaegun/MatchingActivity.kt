@@ -61,6 +61,7 @@ fun MatchingScreen(navController: NavHostController) {
     }
 }
 
+
 @Composable
 fun RequestCard(
     request: MatchRequest,
@@ -91,7 +92,7 @@ fun RequestCard(
             confirmButton = {
                 Button(onClick = {
                     viewModel.approveMatchRequest(request) { chatRoomId ->
-                        navController.navigate("chatting/$chatRoomId")
+                        navController.navigate("chatting/$chatRoomId") // ✅ 수락 후 자동 이동
                     }
                     showDialog = false
                 }) { Text("수락") }
