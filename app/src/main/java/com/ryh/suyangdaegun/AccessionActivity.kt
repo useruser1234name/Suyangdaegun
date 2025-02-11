@@ -102,7 +102,6 @@ fun GenderStep(
             .padding(16.dp)
             .systemBarsPadding(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
         Spacer(modifier = Modifier.height(150.dp))
@@ -523,7 +522,7 @@ fun BirthdateStep(
             } else {
                 Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
             }
-        }) {
+        }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))) {
             Text("다음", fontSize = 28.sp, color = Color.White)
         }
     }
@@ -559,8 +558,8 @@ fun CompleteStep(onComplete: () -> Unit, viewModel: RegistrationViewModel) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF2D3A31)
             )
-        )  {
-        Text("메인 화면으로 이동")
-    }
+        ) {
+            Text("메인 화면으로 이동")
+        }
     }
 }
