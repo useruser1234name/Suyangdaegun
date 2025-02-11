@@ -28,11 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -104,9 +107,46 @@ fun GenderStep(
         verticalArrangement = Arrangement.Top,
 
     ) {
-        Spacer(modifier = Modifier.height(150.dp))
-        Text("안녕하세요! 정보를 입력해주세요.", fontWeight = FontWeight.Bold, fontSize = 30.sp)
-        Text("프로필을 만들고 바로 커뮤니케이션을 시작하는 데 도움이 되는 간단한 정보를 알려주세요.", fontSize = 16.sp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "back",
+                modifier = Modifier.size(30.dp)
+            )
+
+            Box( // 🔹 중앙 정렬을 위한 Box 사용
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "사주정보 입력",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(30.dp))
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+
+        Text(
+            buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                    append("STEP 1")
+                }
+                append(" /4") // 기본 색상 유지
+            },
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("안녕하세요! 성별을 알려주세요.", fontWeight = FontWeight.Bold, fontSize = 24.sp)
 
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -136,7 +176,7 @@ fun GenderStep(
                 )
                 Spacer(modifier = Modifier.width(110.dp))
 
-                Text("남성입니다", color = Color.Black)
+                Text("남자", color = Color.Black)
             }
         }
 
@@ -167,7 +207,7 @@ fun GenderStep(
                         .padding(end = 8.dp)
                 )
                 Spacer(modifier = Modifier.width(110.dp))
-                Text("여성입니다", color = Color.Black)
+                Text("여자", color = Color.Black)
             }
         }
     }
@@ -186,19 +226,61 @@ fun NicknameStep(
             .systemBarsPadding(),
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(150.dp))
-        Text("이름을 입력해 주세요.", fontWeight = FontWeight.Bold, fontSize = 30.sp)
-        Text("본명을 사용해보세요 ", fontSize = 16.sp)
-        Text("실제 이름이 사용자에게 더 매력적입니다.", fontSize = 16.sp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "back",
+                modifier = Modifier.size(30.dp)
+            )
+
+            Box( // 🔹 중앙 정렬을 위한 Box 사용
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "사주정보 입력",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(30.dp))
+        }
+
+        Spacer(modifier = Modifier.height(50.dp))
+        Text(
+            buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                    append("STEP 2")
+                }
+                append(" /4") // 기본 색상 유지
+            },
+            fontWeight = FontWeight.Bold,
+        )
         Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            "어떤 이름으로\n불러드릴까요?",
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        )
+        Spacer(modifier = Modifier.height(30.dp))
+
         TextField(
             value = nickname,
             onValueChange = { nickname = it },
             label = { Text("닉네임") },
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, Color.Gray, RoundedCornerShape(30.dp))
-        )
+                )
+
         Spacer(modifier = Modifier.weight(1f))
         Button(
             onClick = {
@@ -235,7 +317,44 @@ fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewM
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "back",
+                modifier = Modifier.size(30.dp)
+            )
+
+            Box( // 🔹 중앙 정렬을 위한 Box 사용
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "사주정보 입력",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(30.dp))
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+        Text(
+            buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                    append("STEP 3")
+                }
+                append(" /4") // 기본 색상 유지
+            },
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Text("관심사를 선택해 주세요", fontWeight = FontWeight.Bold, fontSize = 24.sp)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -461,15 +580,52 @@ fun BirthdateStep(
             .padding(16.dp)
             .systemBarsPadding(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("생년월일, 시간을 입력해 주세요", fontSize = 24.sp)
-        Text("실제 정보를 입력해 주세요, 사주정보를 분석하는데 사용됩니다")
+        Image(
+            painter = painterResource(id = R.drawable.ic_back),
+            contentDescription = "back",
+            modifier = Modifier.size(30.dp)
+        )
+
+        Box( // 🔹 중앙 정렬을 위한 Box 사용
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "사주정보 입력",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(30.dp))
+    }
+        Spacer(modifier = Modifier.height(50.dp))
+
+        Text(
+            buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                    append("STEP 4")
+                }
+                append(" /4") // 기본 색상 유지
+            },
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("생년월일, 태어난 시간을 입력해 주세요", fontSize = 24.sp,fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = birthdate,
             onValueChange = { birthdate = it },
-            label = { Text("예시) 19740213") },
+            label = { Text("예시) 1974.02.13") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -477,7 +633,7 @@ fun BirthdateStep(
         TextField(
             value = birthtime,
             onValueChange = { birthtime = it },
-            label = { Text("시간") },
+            label = { Text("태어난시간 00:00") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -503,27 +659,39 @@ fun BirthdateStep(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        if (selectedImageUri != null) {
-            Image(
-                painter = rememberAsyncImagePainter(selectedImageUri),
-                contentDescription = "선택된 이미지",
-                modifier = Modifier.size(150.dp)
-            )
-        } else {
-            Text("사진이 선택되지 않았습니다")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            if (birthdate.isNotBlank() && birthtime.isNotBlank() && selectedImageUri != null) {
-                viewModel.setBirthdate(birthdate)
-                viewModel.setBirthtime(birthtime)
-                viewModel.setProfilePicture(selectedImageUri.toString())
-                navController.navigate("complete")
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally // 🔹 가로 중앙 정렬
+        ) {
+            if (selectedImageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(selectedImageUri),
+                    contentDescription = "선택된 이미지",
+                    modifier = Modifier.size(150.dp)
+                )
             } else {
-                Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                Text("사진이 선택되지 않았습니다")
             }
-        }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))) {
-            Text("다음", fontSize = 28.sp, color = Color.White)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if (birthdate.isNotBlank() && birthtime.isNotBlank() && selectedImageUri != null) {
+                        viewModel.setBirthdate(birthdate)
+                        viewModel.setBirthtime(birthtime)
+                        viewModel.setProfilePicture(selectedImageUri.toString())
+                        navController.navigate("complete")
+                    } else {
+                        Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
+            ) {
+                Text("다음", fontSize = 28.sp, color = Color.White)
+            }
         }
     }
 }
