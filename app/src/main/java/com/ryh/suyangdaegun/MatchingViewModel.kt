@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+// 🔹 매칭 요청 데이터 클래스
 data class MatchRequest(
     val senderUid: String = "",
     val senderEmail: String = "",
@@ -33,23 +34,28 @@ class MatchingViewModel : ViewModel() {
     }
 
     /**
-     * 🔹 매칭 요청 Firestore에 저장
+     * 🔹 매칭 요청 Firestore에 저장 (중복 제거)
      */
     fun sendMatchRequestToFirestore(targetUid: String, callback: (Boolean) -> Unit) {
         val senderUid = auth.currentUser?.uid ?: return callback(false)
-
+        val senderEmail = auth.currentUser?.email ?: return callback(false) // 🔹 이메일 추가
         val requestId = "${senderUid}_$targetUid"
 
         firestore.collection("match_requests").document(requestId)
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    callback(false)  // 이미 요청이 존재
+                    callback(false) // ❌ 이미 요청이 존재
                 } else {
-                    val request = MatchRequest(senderUid, targetUid, "pending")
+                    val request = MatchRequest(
+                        senderUid = senderUid,
+                        senderEmail = senderEmail, // 🔹 이메일 정보 포함
+                        receiverUid = targetUid,
+                        receiverEmail = "", // 🔹 나중에 받을 수 있도록 빈 값 유지
+                        status = "pending"
+                    )
 
-                    firestore.collection("match_requests")
-                        .document(requestId)
+                    firestore.collection("match_requests").document(requestId)
                         .set(request)
                         .addOnSuccessListener { callback(true) }
                         .addOnFailureListener { callback(false) }
@@ -70,14 +76,6 @@ class MatchingViewModel : ViewModel() {
             }
     }
 
-    fun cancelMatchRequest(request: MatchRequest) {
-        firestore.collection("match_requests")
-            .document("${request.senderUid}_${request.receiverUid}")
-            .delete()
-            .addOnSuccessListener { Log.d("Matching", "매칭 요청이 취소되었습니다.") }
-            .addOnFailureListener { Log.e("Matching", "매칭 요청 취소 실패", it) }
-    }
-
     /**
      * 🔹 내가 보낸 매칭 요청 목록 가져오기
      */
@@ -88,6 +86,17 @@ class MatchingViewModel : ViewModel() {
                 if (e != null) return@addSnapshotListener
                 callback(snapshot?.toObjects(MatchRequest::class.java) ?: emptyList())
             }
+    }
+
+    /**
+     * 🔹 매칭 요청 취소 기능 추가 ✅
+     */
+    fun cancelMatchRequest(request: MatchRequest) {
+        firestore.collection("match_requests")
+            .document("${request.senderUid}_${request.receiverUid}")
+            .delete()
+            .addOnSuccessListener { Log.d("Matching", "매칭 요청이 취소되었습니다.") }
+            .addOnFailureListener { Log.e("Matching", "매칭 요청 취소 실패", it) }
     }
 
     /**
@@ -131,4 +140,3 @@ class MatchingViewModel : ViewModel() {
         }
     }
 }
-

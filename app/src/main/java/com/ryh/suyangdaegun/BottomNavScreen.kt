@@ -15,9 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
-
 @Composable
-fun BottomNavScreen(navController: NavHostController) { // ✅ navController 추가
+fun BottomNavScreen(navController: NavHostController) { // ✅ `navController` 추가
     val localNavController = rememberNavController()
 
     Scaffold(
@@ -43,7 +42,11 @@ fun BottomNavScreen(navController: NavHostController) { // ✅ navController 추
                     label = { Text("매칭") },
                     selected = currentRoute == "matching",
                     onClick = {
-                        navController.navigate("matching") // ✅ 올바르게 이동
+                        localNavController.navigate("matching") { // ✅ `localNavController`로 변경
+                            popUpTo(localNavController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
                 NavigationBarItem(
@@ -79,7 +82,7 @@ fun BottomNavScreen(navController: NavHostController) { // ✅ navController 추
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("mainScreen") { MainScreen(navController) }
-            composable("matching") { MatchingScreen(navController) } // ✅ MatchingScreen에도 전달
+            composable("matching") { MatchingScreen(navController) } // ✅ `navController` 올바르게 전달
             composable("chatList") { ChatListScreen(navController) }
             composable("myPage") { MyPageScreen(navController) }
         }

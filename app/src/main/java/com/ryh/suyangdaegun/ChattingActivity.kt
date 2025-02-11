@@ -25,7 +25,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // ✅ 새로운 메시지가 추가될 때 자동으로 맨 아래로 스크롤
+    // 🔹 새로운 메시지가 추가될 때 자동으로 맨 아래로 스크롤
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             coroutineScope.launch {
@@ -37,7 +37,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         LazyColumn(
             modifier = Modifier.weight(1f),
-            state = listState // ✅ 스크롤 상태 추가
+            state = listState
         ) {
             items(messages) { message ->
                 MessageBubble(message, isMine = message.senderId == currentUserUid)
