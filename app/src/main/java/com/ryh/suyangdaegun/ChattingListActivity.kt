@@ -28,19 +28,19 @@ fun ChatListScreen(navController: NavHostController, viewModel: ChatListViewMode
     }
 }
 
-// 🔹 채팅방 리스트 아이템 UI
+// ✅ 채팅방 리스트 아이템 UI
 @Composable
-fun ChatRoomItem(chatRoom: ChatRoom, navController: NavHostController) {
+fun ChatRoomItem(chatRoom: ChatRoomItem, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { navController.navigate("chatting/${chatRoom.chatRoomId}") }, // ✅ 채팅방으로 이동
+            .clickable { navController.navigate("chatting/${chatRoom.chatRoomId}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("채팅방 ID: ${chatRoom.chatRoomId}")
-            Text("참여자: ${chatRoom.participants.joinToString()}")
+            Text("참여자: ${chatRoom.participantName}", style = MaterialTheme.typography.bodyLarge) // ✅ 변수명 수정
+            Text("마지막 메시지: ${chatRoom.lastMessage}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
