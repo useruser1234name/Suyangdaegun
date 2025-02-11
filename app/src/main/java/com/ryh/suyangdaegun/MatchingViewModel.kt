@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 // 🔹 매칭 요청 데이터 클래스
 data class MatchRequest(
@@ -14,6 +15,7 @@ data class MatchRequest(
     val status: String = "pending", // "pending", "accepted", "rejected"
     val timestamp: Long = System.currentTimeMillis()
 )
+
 
 class MatchingViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
@@ -38,7 +40,7 @@ class MatchingViewModel : ViewModel() {
      */
     fun sendMatchRequestToFirestore(targetUid: String, callback: (Boolean) -> Unit) {
         val senderUid = auth.currentUser?.uid ?: return callback(false)
-        val senderEmail = auth.currentUser?.email ?: return callback(false) // 🔹 이메일 추가
+        val senderEmail = auth.currentUser?.email ?: return callback(false)
         val requestId = "${senderUid}_$targetUid"
 
         firestore.collection("match_requests").document(requestId)
@@ -49,9 +51,9 @@ class MatchingViewModel : ViewModel() {
                 } else {
                     val request = MatchRequest(
                         senderUid = senderUid,
-                        senderEmail = senderEmail, // 🔹 이메일 정보 포함
+                        senderEmail = senderEmail,
                         receiverUid = targetUid,
-                        receiverEmail = "", // 🔹 나중에 받을 수 있도록 빈 값 유지
+                        receiverEmail = "",
                         status = "pending"
                     )
 
@@ -70,6 +72,7 @@ class MatchingViewModel : ViewModel() {
     fun loadReceivedRequests(userUid: String, callback: (List<MatchRequest>) -> Unit) {
         firestore.collection("match_requests")
             .whereEqualTo("receiverUid", userUid)
+            .whereEqualTo("status", "pending") // ✅ "pending" 상태만 가져옴
             .addSnapshotListener { snapshot, e ->
                 if (e != null) return@addSnapshotListener
                 callback(snapshot?.toObjects(MatchRequest::class.java) ?: emptyList())
@@ -82,6 +85,7 @@ class MatchingViewModel : ViewModel() {
     fun loadSentRequests(userUid: String, callback: (List<MatchRequest>) -> Unit) {
         firestore.collection("match_requests")
             .whereEqualTo("senderUid", userUid)
+            .whereEqualTo("status", "pending") // ✅ "pending" 상태만 가져옴
             .addSnapshotListener { snapshot, e ->
                 if (e != null) return@addSnapshotListener
                 callback(snapshot?.toObjects(MatchRequest::class.java) ?: emptyList())
@@ -99,25 +103,32 @@ class MatchingViewModel : ViewModel() {
             .addOnFailureListener { Log.e("Matching", "매칭 요청 취소 실패", it) }
     }
 
+
     /**
      * 🔹 매칭 요청 수락 (채팅방 생성)
      */
     fun approveMatchRequest(request: MatchRequest, callback: (String) -> Unit) {
-        val chatRoomId = createChatRoomId(request.senderUid, request.receiverUid)
+        val chatRoomId = UUID.randomUUID().toString()
 
-        firestore.collection("match_requests").document("${request.senderUid}_${request.receiverUid}")
-            .update("status", "accepted")
-            .addOnSuccessListener {
-                val chatRoom = mapOf(
-                    "chatRoomId" to chatRoomId,
-                    "participants" to listOf(request.senderUid, request.receiverUid),
-                    "createdAt" to System.currentTimeMillis()
-                )
+        val matchRequestRef = firestore.collection("match_requests")
+            .document("${request.senderUid}_${request.receiverUid}")
 
-                firestore.collection("chat_rooms").document(chatRoomId)
-                    .set(chatRoom)
-                    .addOnSuccessListener { callback(chatRoomId) }
-            }
+        val chatRoomRef = firestore.collection("chat_rooms").document(chatRoomId)
+
+        firestore.runTransaction { transaction ->
+            transaction.update(matchRequestRef, "status", "accepted") // ✅ 상태 변경
+
+            val chatRoom = mapOf(
+                "chatRoomId" to chatRoomId,
+                "participants" to listOf(request.senderUid, request.receiverUid),
+                "createdAt" to System.currentTimeMillis()
+            )
+            transaction.set(chatRoomRef, chatRoom)
+        }.addOnSuccessListener {
+            callback(chatRoomId)
+        }.addOnFailureListener { e ->
+            Log.e("approveMatchRequest", "채팅방 생성 실패", e)
+        }
     }
 
     /**
@@ -126,9 +137,8 @@ class MatchingViewModel : ViewModel() {
     fun declineMatchRequest(request: MatchRequest) {
         firestore.collection("match_requests")
             .document("${request.senderUid}_${request.receiverUid}")
-            .delete()
+            .update("status", "rejected") // ✅ 거절 상태 변경
     }
-
     /**
      * 🔹 채팅방 ID 생성
      */
