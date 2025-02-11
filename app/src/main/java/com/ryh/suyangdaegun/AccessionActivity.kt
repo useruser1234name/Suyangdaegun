@@ -26,14 +26,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.rememberAsyncImagePainter
 import java.io.File
 import java.text.SimpleDateFormat
@@ -64,6 +65,7 @@ class AccessionActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
 fun AccessionNavGraph(uid: String, navController: androidx.navigation.NavHostController, onComplete: () -> Unit) {
     val viewModel: RegistrationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
@@ -76,6 +78,8 @@ fun AccessionNavGraph(uid: String, navController: androidx.navigation.NavHostCon
     }
 }
 
+
+
 @Composable
 fun GenderStep(navController: androidx.navigation.NavHostController, viewModel: RegistrationViewModel) {
     Column(
@@ -85,39 +89,69 @@ fun GenderStep(navController: androidx.navigation.NavHostController, viewModel: 
     ) {
         Spacer(modifier = Modifier.height(150.dp))
         Text("안녕하세요! 정보를 입력해주세요.", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+        Text("프로필을 만들고 바로 커뮤니케이션을 시작하는 데 도움이 되는 간단한 정보를 알려주세요.", fontSize = 16.sp)
+
         Spacer(modifier = Modifier.height(30.dp))
+
         Button(
             onClick = {
                 viewModel.setGender("남성")
                 navController.navigate("nickname")
-            },
-            modifier = Modifier.fillMaxWidth().height(60.dp),
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.man),
-                contentDescription = "남성 아이콘",
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFF5F5F8)
             )
-            Text("남성입니다", color = Color.Black)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.man),
+                    contentDescription = "man icon",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(end = 8.dp)
+                )
+                Spacer(modifier = Modifier.width(110.dp))
+
+                Text("남성입니다", color = Color.Black)
+            }
         }
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 viewModel.setGender("여성")
                 navController.navigate("nickname")
-            },
-            modifier = Modifier.fillMaxWidth().height(60.dp),
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.woman),
-                contentDescription = "여성 아이콘",
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFF5F5F8)
             )
-            Text("여성입니다", color = Color.Black)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.woman),
+                    contentDescription = "woman icon",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(end = 8.dp)
+                )
+                Spacer(modifier = Modifier.width(110.dp))
+                Text("여성입니다", color = Color.Black)
+            }
         }
     }
 }

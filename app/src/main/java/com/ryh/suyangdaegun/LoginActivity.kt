@@ -12,7 +12,9 @@ import com.ryh.suyangdaegun.auth.AuthManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,8 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 
 class LoginActivity : ComponentActivity() {
     private lateinit var authManager: AuthManager
@@ -94,6 +102,8 @@ class LoginActivity : ComponentActivity() {
     }
 }
 
+
+
 @Composable
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit,
@@ -103,30 +113,123 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(horizontal = 16.dp)
+            .systemBarsPadding(),
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 앱 로고 (R.drawable.suyang를 실제 로고 리소스로 대체)
-        Image(
-            painter = painterResource(id = R.drawable.suyang),
-            contentDescription = "App Logo",
-            modifier = Modifier.size(200.dp),
-            contentScale = ContentScale.Fit
-        )
+
+        Spacer(modifier = Modifier.height(140.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.White)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.suyang),
+                contentDescription = "Logo Image",
+                modifier = Modifier.size(width = 230.dp, height = 50.dp),
+                contentScale = ContentScale.Inside
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(text = "새로운 인연", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = onGoogleSignInClick,
-            modifier = Modifier.fillMaxWidth().height(50.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
         ) {
-            Text(text = "Google 로그인", fontSize = 18.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_google),
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(28.dp),
+
+                    )
+                Text(
+                    text = "Google 로그인",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = onKakaoSignInClick,
-            modifier = Modifier.fillMaxWidth().height(50.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
         ) {
-            Text(text = "Kakao 로그인", fontSize = 18.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically, // 수직 정렬
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_kakao),
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(30.dp)
+                )
+
+                Text(
+                    text = "Kakao 로그인",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onKakaoSignInClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF5F5F8))
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically, // 수직 정렬
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_naver),
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(30.dp)
+                )
+
+                Text(
+                    text = "Naver 로그인",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
