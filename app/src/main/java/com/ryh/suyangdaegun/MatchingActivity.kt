@@ -44,7 +44,7 @@ fun MatchingScreen(navController: NavHostController) {
         Text("📤 보낸 요청", style = MaterialTheme.typography.titleMedium)
         LazyColumn(modifier = Modifier.height(300.dp)) {
             items(sentRequests) { request ->
-                RequestCard(request, isReceived = false, viewModel, navController)
+                SentRequestCard(request, viewModel)
             }
         }
     }
@@ -90,6 +90,41 @@ fun RequestCard(
                     viewModel.declineMatchRequest(request)
                     showDialog = false
                 }) { Text("거절") }
+            }
+        )
+    }
+}
+
+@Composable
+fun SentRequestCard(request: MatchRequest, viewModel: MatchingViewModel) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { showDialog = true },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("받는 사람: ${request.receiverEmail}")
+            Text("상태: ${request.status}")
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("매칭 요청 관리") },
+            text = { Text("이 요청을 취소하시겠습니까?") },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.cancelMatchRequest(request)
+                    showDialog = false
+                }) { Text("요청 취소") }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) { Text("유지") }
             }
         )
     }

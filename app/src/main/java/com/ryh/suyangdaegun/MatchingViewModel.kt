@@ -70,6 +70,14 @@ class MatchingViewModel : ViewModel() {
             }
     }
 
+    fun cancelMatchRequest(request: MatchRequest) {
+        firestore.collection("match_requests")
+            .document("${request.senderUid}_${request.receiverUid}")
+            .delete()
+            .addOnSuccessListener { Log.d("Matching", "매칭 요청이 취소되었습니다.") }
+            .addOnFailureListener { Log.e("Matching", "매칭 요청 취소 실패", it) }
+    }
+
     /**
      * 🔹 내가 보낸 매칭 요청 목록 가져오기
      */
