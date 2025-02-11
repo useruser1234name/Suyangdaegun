@@ -1,4 +1,3 @@
-// BottomNavScreen.kt
 package com.ryh.suyangdaegun
 
 import androidx.compose.foundation.layout.padding
@@ -16,58 +15,56 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+
 @Composable
-fun BottomNavScreen(rootNavController: NavHostController) {
-    val navController = rememberNavController()
+fun BottomNavScreen(navController: NavHostController) { // ✅ navController 추가
+    val localNavController = rememberNavController()
+
     Scaffold(
         bottomBar = {
             NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val navBackStackEntry by localNavController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 NavigationBarItem(
-                    icon = { },
+                    icon = { /* 아이콘 추가 가능 */ },
                     label = { Text("메인") },
                     selected = currentRoute == "mainScreen",
                     onClick = {
-                        navController.navigate("mainScreen") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        localNavController.navigate("mainScreen") {
+                            popUpTo(localNavController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
                     }
                 )
                 NavigationBarItem(
-                    icon = { },
+                    icon = { /* 아이콘 추가 가능 */ },
                     label = { Text("매칭") },
                     selected = currentRoute == "matching",
                     onClick = {
-                        navController.navigate("matching") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        navController.navigate("matching") // ✅ 올바르게 이동
                     }
                 )
                 NavigationBarItem(
-                    icon = { },
+                    icon = { /* 아이콘 추가 가능 */ },
                     label = { Text("채팅리스트") },
                     selected = currentRoute == "chatList",
                     onClick = {
-                        navController.navigate("chatList") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        localNavController.navigate("chatList") {
+                            popUpTo(localNavController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
                     }
                 )
                 NavigationBarItem(
-                    icon = { },
+                    icon = { /* 아이콘 추가 가능 */ },
                     label = { Text("마이페이지") },
                     selected = currentRoute == "myPage",
                     onClick = {
-                        navController.navigate("myPage") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        localNavController.navigate("myPage") {
+                            popUpTo(localNavController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -77,14 +74,14 @@ fun BottomNavScreen(rootNavController: NavHostController) {
         }
     ) { innerPadding ->
         NavHost(
-            navController = navController,
+            navController = localNavController,
             startDestination = "mainScreen",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("mainScreen") { MainScreen(rootNavController) }
-            composable("matching") { MatchingScreen(rootNavController) }
-            composable("chatList") { ChatListScreen(rootNavController) }
-            composable("myPage") { MyPageScreen(rootNavController) }
+            composable("mainScreen") { MainScreen(navController) }
+            composable("matching") { MatchingScreen(navController) } // ✅ MatchingScreen에도 전달
+            composable("chatList") { ChatListScreen(navController) }
+            composable("myPage") { MyPageScreen(navController) }
         }
     }
 }

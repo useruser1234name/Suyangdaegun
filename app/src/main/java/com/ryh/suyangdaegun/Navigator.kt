@@ -1,4 +1,3 @@
-// AppNavigator.kt
 package com.ryh.suyangdaegun
 
 import android.util.Log
@@ -7,60 +6,53 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.ryh.suyangdaegun.auth.AuthManager
 
 @Composable
-fun AppNavigator(
+fun AppNavigatorAuth(
     googleSignInLauncher: ActivityResultLauncher<IntentSenderRequest>,
     authManager: AuthManager,
-    navController: androidx.navigation.NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController()
 ) {
-    val registrationViewModel: RegistrationViewModel = viewModel()
-
-    CompositionLocalProvider(LocalViewModelStoreOwner provides LocalViewModelStoreOwner.current!!) {
-        NavHost(navController = navController, startDestination = "auth") {
-            // 인증 플로우
-            navigation(startDestination = "login", route = "auth") {
-                composable("login") {
-                    LoginScreen(
-                        onGoogleSignInClick = {
-                            authManager.signInWithGoogle(
-                                launcher = googleSignInLauncher,
-                                onFailure = { e -> Log.e("LoginScreen", "Google 로그인 실패", e) }
-                            )
-                        },
-                        onKakaoSignInClick = {
-                            // 예시로 카카오 로그인 시 바로 메인으로 이동
-                            navController.navigate("main") { popUpTo("auth") { inclusive = true } }
+    // 시작 라우트는 "login"으로 설정 (로그인 화면)
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(
+                onGoogleSignInClick = {
+                    authManager.signInWithGoogle(
+                        launcher = googleSignInLauncher,
+                        onFailure = { e ->
+                            // 로그인 실패 시 로그 출력 및 사용자에게 안내
+                            Log.e("AppNavigatorAuth", "Google 로그인 실패", e)
                         }
                     )
+                },
+                onKakaoSignInClick = {
+                    // Kakao 로그인 구현 (필요 시)
                 }
-                composable("gender") { GenderStep(navController, registrationViewModel) }
-                composable("nickname") { NicknameStep(navController, registrationViewModel) }
-                composable("interests") { InterestsStep(navController, registrationViewModel) }
-                composable("birthdate") { BirthdateStep(navController, registrationViewModel) }
-                composable("complete") {
-                    CompleteStep(
-                        onComplete = { navController.navigate("main") { popUpTo("auth") { inclusive = true } } },
-                        viewModel = registrationViewModel
-                    )
-                }
+            )
+        }
+    }
+}
+
+@Composable
+fun AppNavigatorMain(navController: NavHostController = rememberNavController()) {
+    val owner = LocalViewModelStoreOwner.current ?: error("No ViewModelStoreOwner found")
+    CompositionLocalProvider(LocalViewModelStoreOwner provides owner) {
+        NavHost(navController = navController, startDestination = "bottomNav") {
+            composable("bottomNav") { BottomNavScreen(navController) } // ✅ 수정된 BottomNavScreen 사용
+            composable("chatting/{chatRoomId}") { backStackEntry ->
+                val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: "default"
+                val chatViewModel: ChatViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                    factory = ChatViewModelFactory(chatRoomId)
+                )
+                ChattingScreen(navController, chatViewModel)
             }
-            // 메인 플로우 (하단 네비게이션 포함)
-            navigation(startDestination = "bottomNav", route = "main") {
-                composable("bottomNav") { BottomNavScreen(rootNavController = navController) }
-                composable("chatting/{chatRoomId}") { backStackEntry ->
-                    val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: "default"
-                    val chatViewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(chatRoomId))
-                    ChattingScreen(navController, chatViewModel)
-                }
-                composable("faceAnalysis") { FaceAnalysisScreen(navController) }
-            }
+            composable("matching") { MatchingScreen(navController) } // ✅ MatchingScreen도 navController 전달
         }
     }
 }

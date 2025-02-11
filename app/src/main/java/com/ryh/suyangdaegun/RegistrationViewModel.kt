@@ -1,85 +1,50 @@
-// RegistrationViewModel.kt
 package com.ryh.suyangdaegun
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegistrationViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
-    private val database = FirebaseDatabase.getInstance()
+    private val firestoreDb = FirebaseFirestore.getInstance().collection("users")
 
-    var gender: String = ""
-        private set
-    var nickname: String = ""
-        private set
-    var birthdate: String = ""
-        private set
-    var birthtime: String = ""
-        private set
-    var profilePicture: String = ""
-        private set
-    var interests: List<String> = listOf()
-        private set
+    private var nickname: String = ""
+    private var birthdate: String = ""
+    private var birthtime: String = ""
+    private var gender: String = ""
+    private var email: String = auth.currentUser?.email ?: ""
+    private var interests: List<String> = emptyList()
+    private var profilePictureUrl: String = ""
 
-    fun setGender(newGender: String) {
-        if (newGender.isNotBlank()) {
-            gender = newGender
-            Log.d("RegistrationViewModel", "성별 설정 완료: $gender")
-        } else {
-            Log.e("RegistrationViewModel", "성별 값이 비어 있습니다.")
-        }
-    }
-
-    fun setNickname(newNickname: String) {
-        if (newNickname.isNotBlank()) nickname = newNickname
-    }
-
-    fun setBirthdate(newBirthdate: String) {
-        if (newBirthdate.isNotBlank()) birthdate = newBirthdate
-    }
-
-    fun setBirthtime(newBirthtime: String) {
-        if (newBirthtime.isNotBlank()) birthtime = newBirthtime
-    }
-
-    fun setProfilePicture(newProfilePicture: String) {
-        if (newProfilePicture.isNotBlank()) profilePicture = newProfilePicture
-    }
-
-    fun setInterests(newInterests: List<String>) {
-        if (newInterests.isNotEmpty()) interests = newInterests
-    }
+    fun setNickname(value: String) { nickname = value }
+    fun setBirthdate(value: String) { birthdate = value }
+    fun setBirthtime(value: String) { birthtime = value }
+    fun setGender(value: String) { gender = value }
+    fun setInterests(value: List<String>) { interests = value }
+    fun setProfilePicture(value: String) { profilePictureUrl = value }
 
     fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        val uid = auth.currentUser?.uid ?: run {
-            onFailure(Exception("Firebase UID를 가져오지 못했습니다."))
-            return
+        val uid = auth.currentUser?.uid ?: return onFailure(Exception("User not authenticated"))
+
+        if (nickname.isBlank() || birthdate.isBlank() || birthtime.isBlank() || gender.isBlank() || email.isBlank() || interests.isEmpty()) {
+            return onFailure(Exception("회원가입 필수 정보 누락"))
         }
-        if (gender.isBlank() || nickname.isBlank() || birthdate.isBlank()) {
-            onFailure(Exception("필수 정보가 누락되었습니다."))
-            return
-        }
+
         val userData = mapOf(
-            "uid" to uid,
-            "email" to auth.currentUser?.email.orEmpty(),
-            "gender" to gender,
+            "uid" to uid, // 🔹 UID 기반 저장
             "nickname" to nickname,
             "birthdate" to birthdate,
             "birthtime" to birthtime,
+            "gender" to gender,
+            "email" to email,
             "interests" to interests,
-            "profilePicture" to profilePicture
+            "profilePicture" to profilePictureUrl
         )
-        database.getReference("users").child(uid)
-            .setValue(userData)
-            .addOnSuccessListener {
-                Log.d("RegistrationViewModel", "유저 데이터 저장 성공")
-                onSuccess()
-            }
-            .addOnFailureListener { e ->
-                Log.e("RegistrationViewModel", "유저 데이터 저장 실패", e)
-                onFailure(e)
-            }
+
+        firestoreDb.document(uid).set(userData) // ✅ Firestore에 UID 기반 저장
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
     }
 }

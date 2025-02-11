@@ -1,4 +1,3 @@
-// ChattingScreen.kt
 package com.ryh.suyangdaegun
 
 import androidx.compose.foundation.layout.*
@@ -22,9 +21,10 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("채팅 방", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { message ->
-                Text("${message.sender}: ${message.content}", style = MaterialTheme.typography.bodyLarge)
+                Text("${message.sender}: ${message.content}")
             }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -34,6 +34,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("메시지 입력") }
             )
+            Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
                 if (input.isNotBlank()) {
                     coroutineScope.launch { viewModel.sendMessage(input) }

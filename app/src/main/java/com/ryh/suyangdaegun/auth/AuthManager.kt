@@ -1,7 +1,7 @@
-// AuthManager.kt
 package com.ryh.suyangdaegun.auth
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -18,8 +18,9 @@ class AuthManager(private val activity: SuyangdaegunApp) {
 
     fun signInWithGoogle(
         launcher: ActivityResultLauncher<IntentSenderRequest>,
-        onFailure: (Exception) -> Unit
+        onFailure: (Exception) -> Unit // 🔹 추가된 콜백
     ) {
+        Log.d("AuthManager", "signInWithGoogle called")
         val signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
@@ -32,19 +33,23 @@ class AuthManager(private val activity: SuyangdaegunApp) {
 
         signInClient.beginSignIn(signInRequest)
             .addOnSuccessListener { result ->
+                Log.d("AuthManager", "beginSignIn successful; launching pendingIntent")
                 launcher.launch(IntentSenderRequest.Builder(result.pendingIntent).build())
             }
-            .addOnFailureListener { onFailure(it) }
+            .addOnFailureListener { e ->
+                Log.e("AuthManager", "beginSignIn failed", e)
+                onFailure(e) // 🔹 onFailure 콜백 호출
+            }
     }
 
     fun handleSignInResult(
         data: Intent?,
-        onSuccess: (Boolean, String) -> Unit,  // (isExistingUser, uid)
+        onSuccess: (isNewUser: Boolean, uid: String, email: String?) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
         try {
             val credential = signInClient.getSignInCredentialFromIntent(data)
-            val idToken = credential.googleIdToken ?: throw Exception("ID 토큰 없음")
+            val idToken = credential.googleIdToken ?: throw Exception("No ID token")
             val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
 
             auth.signInWithCredential(firebaseCredential)
@@ -52,13 +57,14 @@ class AuthManager(private val activity: SuyangdaegunApp) {
                     if (task.isSuccessful) {
                         val user = auth.currentUser
                         if (user != null) {
-                            // 여기서는 간단히 onSuccess(true, uid) 처리합니다.
-                            onSuccess(true, user.uid)
+                            val isNewUser = task.result?.additionalUserInfo?.isNewUser ?: false
+                            Log.d("AuthManager", "Firebase login success: ${user.uid}, isNewUser=$isNewUser")
+                            onSuccess(isNewUser, user.uid, user.email)
                         } else {
-                            onFailure(Exception("Firebase 사용자 없음"))
+                            onFailure(Exception("No Firebase user"))
                         }
                     } else {
-                        onFailure(task.exception ?: Exception("로그인 실패"))
+                        onFailure(task.exception ?: Exception("Login failed"))
                     }
                 }
         } catch (e: Exception) {

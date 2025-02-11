@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,137 +38,130 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ryh.suyangdaegun.auth.AuthManager
 
 class MainActivity : ComponentActivity() {
-    private lateinit var authManager: AuthManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        authManager = (application as SuyangdaegunApp).authManager
-
-        val googleSignInLauncher =
-            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    authManager.handleSignInResult(
-                        data = result.data,
-                        onSuccess = { isExistingUser, uid ->
-                            if (!isExistingUser) {
-                                navigateToAccession(uid)
-                            }
-                        },
-                        onFailure = { e -> Log.e("MainActivity", "로그인 실패", e) }
-                    )
-                } else {
-                    Log.e("MainActivity", "Google 로그인 취소됨")
-                }
-            }
-        setContent {
-            AppNavigator(googleSignInLauncher, authManager)
-        }
-    }
-
-    private fun navigateToAccession(uid: String?) {
-        if (uid.isNullOrEmpty()) {
-            Log.e("MainActivity", "회원가입 화면으로 이동하려 했으나 UID가 없음")
-            return
-        }
-        val intent = Intent(this, AccessionActivity::class.java).apply {
-            putExtra("uid", uid)
-        }
-        startActivity(intent)
-        finish()
+        // 메인 네비게이션 실행 (여기서 AppNavigatorMain이 호출되어 BottomNavScreen 등 포함)
+        setContent { AppNavigatorMain() }
     }
 }
 
 data class DummyUser(val name: String, val email: String)
 
 @Composable
-fun MainScreen(navController: NavHostController) {
-    val recommendedUsers = listOf(
-        DummyUser("추천1", "a01062943361@gmail.com"),
-        DummyUser("추천2", "a01062943361@gmail.com"),
-        DummyUser("추천3", "a01062943361@gmail.com"),
-        DummyUser("추천4", "a01062943361@gmail.com"),
-        DummyUser("추천5", "a01062943361@gmail.com")
-    )
-
-    var selectedRequest by remember { mutableStateOf<RequestEntry?>(null) }
-    var showConfirmation by remember { mutableStateOf(false) }
+fun MainScreen(rootNavController: androidx.navigation.NavHostController) {
+    val viewModel: MatchingViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("오늘의 추천", fontSize = 28.sp)
-        Spacer(modifier = Modifier.height(16.dp))
+        Text("오늘의 추천", modifier = Modifier.padding(bottom = 16.dp))
+        val dummyCards = List(5) { index -> "추천 카드 ${index + 1}" }
         LazyColumn {
-            items(recommendedUsers) { user ->
-                Box(
+            items(dummyCards) { card ->
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
                         .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.img_1),
-                        contentDescription = "추천 카드",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(user.name, fontSize = 20.sp, color = Color.White)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Button(onClick = {
-                            val currentUser = FirebaseAuth.getInstance().currentUser
-                            val senderUid = currentUser?.uid ?: ""
-                            val senderEmail = currentUser?.email ?: ""
-                            // 실제 대상의 UID로 교체하세요.
-                            val targetUid = "TARGET_UID"
-                            val targetEmail = "a01062943361@gmail.com"
-                            val targetName = "특정 사용자"
-                            selectedRequest = RequestEntry(senderUid, senderEmail, targetUid, targetEmail, targetName)
-                            showConfirmation = true
-                        }) {
-                            Text("대화 요청")
+                        .clickable {
+                            val targetEmail = "a01062946631@gmail.com" // 매칭할 대상의 이메일
+
+                            // 🔹 상대방 UID 찾기 -> 찾은 후 매칭 요청 전송
+                            viewModel.findUserByEmail(targetEmail) { targetUid ->
+                                if (targetUid != null) {
+                                    viewModel.sendMatchRequest(
+                                        targetUid = targetUid,
+                                        onSuccess = { Log.d("Matching", "매칭 요청 성공!") },
+                                        onFailure = { e -> Log.e("Matching", "매칭 요청 실패: ${e.message}") }
+                                    )
+                                } else {
+                                    Log.e("Matching", "해당 이메일의 사용자를 찾을 수 없습니다.")
+                                }
+                            }
                         }
-                    }
+                ) {
+                    Text(card, modifier = Modifier.padding(16.dp))
                 }
             }
         }
     }
-    if (showConfirmation && selectedRequest != null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("대화 요청을 보내시겠습니까?", fontSize = 20.sp)
-                Spacer(modifier = Modifier.height(16.dp))
-                Row {
-                    Button(onClick = {
-                        DummyRequestData.sentRequests.add(selectedRequest!!)
-                        DummyRequestData.receivedRequests.add(selectedRequest!!)
-                        showConfirmation = false
-                        selectedRequest = null
-                    }) {
-                        Text("전송")
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = {
-                        showConfirmation = false
-                        selectedRequest = null
-                    }) {
-                        Text("취소")
-                    }
+}
+
+
+
+//// Firebase Realtime Database에 매칭 요청 전송
+//fun sendMatchRequest() {
+//    val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+//    // 특정 사용자 이메일
+//    val targetEmail = "a01062946631@gmail.com"
+//    // 실제 환경에서는 targetEmail을 기반으로 대상 uid 조회 필요 (예제에서는 단순 처리)
+//    val request = RequestEntry(
+//        senderUid = currentUser.uid,
+//        senderEmail = currentUser.email ?: "",
+//        receiverUid = "target_uid", // 실제 대상 uid로 대체
+//        receiverEmail = targetEmail,
+//        receiverName = "타겟 사용자"
+//    )
+//    FirebaseDatabase.getInstance().getReference("matchRequests")
+//        .push()
+//        .setValue(request)
+//}
+//
+//
+
+data class MatchRequest(
+    val senderUid: String = "",
+    val senderEmail: String = "",
+    val receiverUid: String = "",
+    val receiverEmail: String = "",
+    val status: String = "pending" // "pending", "accepted", "rejected"
+)
+
+class MatchingViewModel : ViewModel() {
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    /**
+     * 🔹 이메일을 UID로 변환하는 함수
+     */
+    fun findUserByEmail(targetEmail: String, onResult: (String?) -> Unit) {
+        firestore.collection("users")
+            .whereEqualTo("email", targetEmail)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    onResult(null) // 사용자를 찾지 못한 경우
+                } else {
+                    val targetUid = documents.documents[0].id
+                    onResult(targetUid) // 찾은 UID 반환
                 }
             }
-        }
+            .addOnFailureListener { onResult(null) }
     }
+
+    /**
+     * 🔹 매칭 요청 전송 함수 (이제 targetUid를 직접 받음)
+     */
+    fun sendMatchRequest(targetUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val senderUid = auth.currentUser?.uid ?: return onFailure(Exception("User not authenticated"))
+        val senderEmail = auth.currentUser?.email ?: return onFailure(Exception("No email found"))
+
+        val request = MatchRequest(senderUid, senderEmail, targetUid, "pending")
+
+        firestore.collection("match_requests")
+            .document("${senderUid}_$targetUid") // ✅ UID 기반 저장 (중복 방지)
+            .set(request)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
+    }
+
+
 }
