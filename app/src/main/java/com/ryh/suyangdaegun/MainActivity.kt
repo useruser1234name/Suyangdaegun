@@ -4,10 +4,16 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,6 +37,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(rootNavController: NavHostController) {
     val viewModel: MatchingViewModel = viewModel()
+    val visible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        visible.value = true
+    }
+
     val recommendedUsers = listOf(
         "당신의 부드러운 이목구비와 상대의 강렬한 인상이 만나 폭발적인 케미를 일으킬 운명의 커플입니다.",
 
@@ -57,6 +69,7 @@ fun MainScreen(rootNavController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(Color(0xFFF8F8F8))
             .systemBarsPadding()
     ) {
         Row(
@@ -75,7 +88,7 @@ fun MainScreen(rootNavController: NavHostController) {
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text("${UserState.nickname}님 오늘의 추천 상대입니다")
+                Text("${UserState.nickname}님 오늘의 추천 상대입니다", fontSize = 20.sp)
             }
 
             Spacer(modifier = Modifier.width(30.dp))
@@ -84,8 +97,22 @@ fun MainScreen(rootNavController: NavHostController) {
         Divider(modifier = Modifier.fillMaxWidth())
 
         LazyColumn {
-            items(recommendedUsers.take(5)) { title ->
-                MatchUserCard(title, viewModel, rootNavController)
+            itemsIndexed(recommendedUsers.take(5)) { index, title ->
+                AnimatedVisibility(
+                    visible = visible.value,
+                    enter = slideInVertically(
+                        initialOffsetY = { it * 2 },
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            delayMillis = index * 200 // 각 아이템마다 약간의 딜레이를 줘서 순차적으로 나타나게 함
+                        )
+                    ) + fadeIn(
+                        initialAlpha = 0f,
+                        animationSpec = tween(durationMillis = 300)
+                    )
+                ) {
+                    MatchUserCard(title, viewModel, rootNavController)
+                }
             }
         }
         Button(
@@ -127,29 +154,48 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
         }
     }
 
-
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("매칭 요청") },
             text = { Text("이 사용자와 매칭 요청을 보낼까요?") },
-            confirmButton = {
-                Button(onClick = {
-                    val targetEmail = "kc01184@gmail.com"
-                    viewModel.getUserUidByEmail(targetEmail) { targetUid ->
-                        if (targetUid != null) {
-                            viewModel.sendMatchRequestToFirestore(targetUid) { success ->
-                                if (success) Log.d("Matching", "매칭 요청 성공!")
-                                showDialog = false
+            confirmButton = { //  YES 버튼을 먼저 배치
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End //  오른쪽 정렬
+                ) {
+                    Button(
+                        onClick = {
+                            val targetEmail = "kc01184@gmail.com"
+                            viewModel.getUserUidByEmail(targetEmail) { targetUid ->
+                                if (targetUid != null) {
+                                    viewModel.sendMatchRequestToFirestore(targetUid) { success ->
+                                        if (success) Log.d("Matching", "매칭 요청 성공!")
+                                        showDialog = false
+                                    }
+                                } else {
+                                    Log.e("Matching", "사용자를 찾을 수 없습니다.")
+                                }
                             }
-                        } else {
-                            Log.e("Matching", "사용자를 찾을 수 없습니다.")
-                        }
-                    }
-                }) { Text("YES") }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) { Text("NO") }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black, //  버튼 배경 검은색
+                            contentColor = Color.White    //  버튼 글자 흰색
+                        )
+                    ) { Text("YES") }
+
+                    Spacer(modifier = Modifier.width(8.dp)) //  버튼 사이 간격 추가
+
+                    Button(
+                        onClick = { showDialog = false },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black, //  버튼 배경 검은색
+                            contentColor = Color.White    //  버튼 글자 흰색
+                        )
+                    ) { Text("NO") }
+                }
             }
         )
     }

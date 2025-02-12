@@ -76,7 +76,7 @@ fun MatchingScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Column() {
-            Text("📩 나에게 편지보낸 친구", style = MaterialTheme.typography.titleMedium)
+            Text("📩나에게 편지보낸 친구", fontSize = 20.sp)
             LazyColumn(modifier = Modifier.weight(0.5f)) {
                 items(receivedRequests) { request ->
                     RequestCard(request, isReceived = true, viewModel, navController)
@@ -85,7 +85,7 @@ fun MatchingScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("📤 내가 편지보낸 친구", style = MaterialTheme.typography.titleMedium)
+            Text("📤내가 편지보낸 친구", fontSize = 20.sp)
             LazyColumn(modifier = Modifier.weight(0.5f)) {
                 items(sentRequests) { request ->
                     SentRequestCard(request, viewModel)
