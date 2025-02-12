@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -138,18 +139,31 @@ fun RequestCard(
             title = { Text("매칭 요청") },
             text = { Text("$senderNickname 님의 요청을 수락하시겠습니까?") },
             confirmButton = {
-                Button(onClick = {
-                    viewModel.approveMatchRequest(request) { chatRoomId ->
-                        navController.navigate("chatting/$chatRoomId") // ✅ 수락 후 자동 이동
-                    }
-                    showDialog = false
-                }) { Text("수락") }
+                Button(
+                    onClick = {
+                        viewModel.approveMatchRequest(request) { chatRoomId ->
+                            navController.navigate("chatting/$chatRoomId") // 수락 후 자동 이동
+                        }
+
+                        showDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) { Text("수락") }
             },
             dismissButton = {
-                Button(onClick = {
-                    viewModel.declineMatchRequest(request)
-                    showDialog = false
-                }) { Text("거절") }
+                Button(
+                    onClick = {
+                        viewModel.declineMatchRequest(request)
+                        showDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) { Text("거절") }
             }
         )
     }
@@ -186,13 +200,25 @@ fun SentRequestCard(request: MatchRequest, viewModel: MatchingViewModel) {
             title = { Text("매칭 요청 관리") },
             text = { Text("이 요청을 취소하시겠습니까?") },
             confirmButton = {
-                Button(onClick = {
-                    viewModel.cancelMatchRequest(request)
-                    showDialog = false
-                }) { Text("요청 취소") }
+                Button(
+                    onClick = {
+                        viewModel.cancelMatchRequest(request)
+                        showDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) { Text("요청 취소") }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) { Text("유지") }
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) { Text("유지") }
             }
         )
     }
