@@ -224,7 +224,7 @@ fun NicknameStep(
     navController: androidx.navigation.NavHostController,
     viewModel: RegistrationViewModel
 ) {
-    var nickname by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -290,8 +290,8 @@ fun NicknameStep(
         Spacer(modifier = Modifier.weight(1f))
         Button(
             onClick = {
-                if (nickname.isNotBlank()) {
-                    viewModel.setNickname(nickname)
+                if (UserState.nickname.isNotBlank()) {
+                    viewModel.setNickname(UserState.nickname)
                     navController.navigate("interests")
                 }
             },

@@ -116,7 +116,7 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable { showDialog = true }
-            .size(height = 250.dp, width = 370.dp),
+            .size(height = 150.dp, width = 370.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFF5F5F5)  // 연한 실버
