@@ -215,6 +215,10 @@ fun GenderStep(
     }
 }
 
+object UserState {
+    var nickname by mutableStateOf("")
+}
+
 @Composable
 fun NicknameStep(
     navController: androidx.navigation.NavHostController,
@@ -276,12 +280,11 @@ fun NicknameStep(
         Spacer(modifier = Modifier.height(30.dp))
 
         OutlinedTextField(
-            value = nickname,
-            onValueChange = { nickname = it },
+            value = UserState.nickname,
+            onValueChange = { UserState.nickname = it },
             label = { Text("닉네임") },
             modifier = Modifier
                 .fillMaxWidth(),
-
         )
 
         Spacer(modifier = Modifier.weight(1f))
