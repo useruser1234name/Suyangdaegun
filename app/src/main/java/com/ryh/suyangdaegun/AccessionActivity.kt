@@ -47,6 +47,8 @@ import coil3.compose.rememberAsyncImagePainter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.Text
 
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,7 +108,7 @@ fun GenderStep(
             .systemBarsPadding(),
         verticalArrangement = Arrangement.Top,
 
-    ) {
+        ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -273,13 +275,14 @@ fun NicknameStep(
         )
         Spacer(modifier = Modifier.height(30.dp))
 
-        TextField(
+        OutlinedTextField(
             value = nickname,
             onValueChange = { nickname = it },
             label = { Text("닉네임") },
             modifier = Modifier
-                .fillMaxWidth()
-                )
+                .fillMaxWidth(),
+
+        )
 
         Spacer(modifier = Modifier.weight(1f))
         Button(
@@ -581,33 +584,34 @@ fun BirthdateStep(
             .systemBarsPadding(),
         verticalArrangement = Arrangement.Top,
 
-    ) {Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_back),
-            contentDescription = "back",
-            modifier = Modifier.size(30.dp)
-        )
-
-        Box( // 🔹 중앙 정렬을 위한 Box 사용
+        ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                "사주정보 입력",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+            Image(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "back",
+                modifier = Modifier.size(30.dp)
             )
-        }
 
-        Spacer(modifier = Modifier.width(30.dp))
-    }
+            Box( // 🔹 중앙 정렬을 위한 Box 사용
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "사주정보 입력",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(30.dp))
+        }
         Spacer(modifier = Modifier.height(50.dp))
 
         Text(
@@ -620,23 +624,26 @@ fun BirthdateStep(
             fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text("생년월일, 태어난 시간을 입력해 주세요", fontSize = 24.sp,fontWeight = FontWeight.Bold)
+        Text("생년월일, 태어난 시간을 입력해 주세요", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        TextField(
+        OutlinedTextField(
             value = birthdate,
             onValueChange = { birthdate = it },
             label = { Text("예시) 1974.02.13") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+
+        OutlinedTextField(
             value = birthtime,
             onValueChange = { birthtime = it },
             label = { Text("태어난시간 00:00") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+
         Spacer(modifier = Modifier.height(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             Button(

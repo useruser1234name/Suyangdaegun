@@ -91,7 +91,7 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
             text = { Text("이 사용자와 매칭 요청을 보낼까요?") },
             confirmButton = {
                 Button(onClick = {
-                    val targetEmail = "a01062946631@gmail.com"
+                    val targetEmail = "kc01184@gmail.com"
                     viewModel.getUserUidByEmail(targetEmail) { targetUid ->
                         if (targetUid != null) {
                             viewModel.sendMatchRequestToFirestore(targetUid) { success ->
