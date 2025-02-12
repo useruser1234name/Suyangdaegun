@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,23 +47,14 @@ fun MainScreen(rootNavController: NavHostController) {
 
     val recommendedUsers = listOf(
         "당신의 부드러운 이목구비와 상대의 강렬한 인상이 만나 폭발적인 케미를 일으킬 운명의 커플입니다.",
-
         "거울을 보는 듯 놀라운 싱크로율의 얼굴형과 이목구비는 당신들이 태생부터 운명적으로 연결된 소울메이트임을 보여줍니다.",
-
         "당신과 상대방의 '금(金) 오행'이 만나 폭발적인 스파크가 일어날 천생연분의 커플입니다.",
-
         "정반대의 매력이 만나 그 어떤 배우 커플보다도 완벽한 비주얼 시너지를 만들어낼 운명의 한 쌍입니다.",
-
         "이마부터 입술까지 완벽한 황금비율로 조화를 이루는 당신들은 하늘이 점지한 최고의 커플입니다.",
-
         "첫 만남부터 터지는 케미스트리로 주변의 모든 시선을 사로잡을 운명의 커플입니다.",
-
         "겉모습은 달라도 묘하게 일치하는 당신들의 얼굴형은 천생연분임을 증명하는 가장 확실한 증거입니다.",
-
         "극과 극이 만나 폭발적인 chemistry를 만들어내는 당신들의 조합은 그 자체로 완벽한 걸작입니다.",
-
         "얼굴의 모든 요소가 만드는 완벽한 조화는 마치 운명이 빚어낸 예술품 같은 커플입니다.",
-
         "서로의 눈빛이 마주치는 순간, 르네상스 시대의 걸작을 보는 듯한 감동을 선사하는 운명의 커플입니다."
     )
 
@@ -69,7 +62,6 @@ fun MainScreen(rootNavController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .background(Color(0xFFF8F8F8))
             .systemBarsPadding()
     ) {
         Row(
@@ -96,8 +88,13 @@ fun MainScreen(rootNavController: NavHostController) {
 
         Divider(modifier = Modifier.fillMaxWidth())
 
-        LazyColumn {
-            itemsIndexed(recommendedUsers.take(5)) { index, title ->
+        // 스크롤 영역에 weight(1f) 추가하여 남은 공간만 사용하도록 함
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            recommendedUsers.take(5).forEachIndexed { index, title ->
                 AnimatedVisibility(
                     visible = visible.value,
                     enter = slideInVertically(
@@ -134,6 +131,7 @@ fun MainScreen(rootNavController: NavHostController) {
     }
 }
 
+
 @Composable
 fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: NavHostController) {
     var showDialog by remember { mutableStateOf(false) }
@@ -143,7 +141,8 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable { showDialog = true }
-            .size(height = 150.dp, width = 370.dp),
+            .size(height = 130.dp, width = 370.dp),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFF5F5F5)  // 연한 실버
@@ -200,3 +199,4 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
         )
     }
 }
+
