@@ -31,17 +31,22 @@ fun MyPageScreen(navController: NavHostController) {
             .padding(16.dp)
     ) {
         Text(
-            "마이페이지", fontSize = 25.sp,
+            "내 정보", fontSize = 25.sp,
             modifier = Modifier.height(50.dp)
         )
 
         Divider(modifier = Modifier.fillMaxWidth())
 
+        Spacer(modifier = Modifier.height(20.dp))
+
+        GridMenuScreen()
+
+        Spacer(modifier = Modifier.height(20.dp))
 
 
         Text(
             text = "알림",
-            fontSize = 18.sp,
+            fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(horizontal = 16.dp),
@@ -72,11 +77,11 @@ fun MyPageScreen(navController: NavHostController) {
                 .padding(horizontal = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = "We Contact",
-            fontSize = 18.sp,
+            fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(horizontal = 16.dp),
@@ -165,7 +170,7 @@ fun ClickableMenuItem(text: String) {
     ) {
         Text(
             text = text,
-            fontSize = 14.sp,
+            fontSize = 21.sp,
             modifier = Modifier.align(Alignment.CenterStart),
             color = Color.Black
         )
@@ -173,3 +178,84 @@ fun ClickableMenuItem(text: String) {
 }
 
 
+@Composable
+fun GridMenuScreen() {
+    val menuItems = listOf(
+        "오늘의 운세" to R.drawable.ic_todayunse,
+        "정통 사주" to R.drawable.ic_jeontong,
+        "로또 번호" to R.drawable.ic_lotto,
+        "여행" to R.drawable.ic_travel,
+        "공동구매" to R.drawable.ic_gonggu,
+        "병원동행" to R.drawable.ic_hospital,
+        "프리미엄" to R.drawable.ic_premium,
+        "88다방" to R.drawable.ic_dabang,
+        "모임" to R.drawable.ic_moim
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Text(
+            "메뉴", fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+        )
+
+        Divider(
+            color = Color.Gray, // 선의 색상
+            thickness = 0.5.dp,   // 선의 두께
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
+
+        GridMenu(menuItems)
+    }
+}
+
+@Composable
+fun GridMenu(menuItems: List<Pair<String, Int>>) {
+    Column {
+        menuItems.chunked(3).forEach { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                rowItems.forEach { (label, imageRes) ->
+                    MenuItem(label, imageRes)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MenuItem(label: String, imageRes: Int) {
+    Card(
+        modifier = Modifier
+            .size(100.dp)
+            .padding(8.dp)
+            .clickable { /* 클릭 이벤트 추가 가능 */ },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = label,
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            Text(label, fontSize = 18.sp, color = Color.Black)
+        }
+    }
+}
