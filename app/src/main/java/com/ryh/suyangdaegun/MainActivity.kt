@@ -57,6 +57,7 @@ fun MainScreen(rootNavController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .systemBarsPadding()
     ) {
         Row(
             modifier = Modifier
@@ -66,8 +67,7 @@ fun MainScreen(rootNavController: NavHostController) {
         ) {
             Text(
                 "홈",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 25.sp,
             )
             Box(
                 modifier = Modifier
