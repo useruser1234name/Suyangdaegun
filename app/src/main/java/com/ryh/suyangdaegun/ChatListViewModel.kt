@@ -40,7 +40,7 @@ class ChatListViewModel : ViewModel() {
                     val chatRoomId = document.id
                     val participants = document.get("participants") as? List<String> ?: emptyList()
 
-                    // ✅ 현재 유저를 제외한 상대방 UID만 가져오기
+                    //  현재 유저를 제외한 상대방 UID만 가져오기
                     val otherUserUid = participants.firstOrNull { it != currentUserUid }
 
                     if (otherUserUid != null) {

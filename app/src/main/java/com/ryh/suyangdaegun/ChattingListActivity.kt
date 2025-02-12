@@ -75,7 +75,7 @@ fun ChatListScreen(navController: NavHostController, viewModel: ChatListViewMode
     }
 }
 
-// ✅ 채팅방 리스트 아이템 UI
+//  채팅방 리스트 아이템 UI
 @Composable
 fun ChatRoomItem(chatRoom: ChatRoomItem, navController: NavHostController) {
     Card(
@@ -92,7 +92,7 @@ fun ChatRoomItem(chatRoom: ChatRoomItem, navController: NavHostController) {
             Text(
                 "참여자: ${chatRoom.participantName}",
                 style = MaterialTheme.typography.bodyLarge
-            ) // ✅ 변수명 수정
+            ) //  변수명 수정
             Text("마지막 메시지: ${chatRoom.lastMessage}", style = MaterialTheme.typography.bodyMedium)
         }
     }
