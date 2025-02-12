@@ -43,7 +43,7 @@ class RegistrationViewModel : ViewModel() {
             "profilePicture" to profilePictureUrl
         )
 
-        firestoreDb.document(uid).set(userData) // ✅ Firestore에 UID 기반 저장
+        firestoreDb.document(uid).set(userData) //  Firestore에 UID 기반 저장
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure(e) }
     }

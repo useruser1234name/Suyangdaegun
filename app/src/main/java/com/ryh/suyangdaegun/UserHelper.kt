@@ -5,7 +5,7 @@ object UserHelper {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    // ✅ 특정 UID의 유저 닉네임 가져오기
+    //  특정 UID의 유저 닉네임 가져오기
     fun getParticipantName(userUid: String, callback: (String) -> Unit) {
         firestore.collection("users").document(userUid).get()
             .addOnSuccessListener { snapshot ->
@@ -14,7 +14,7 @@ object UserHelper {
             }
     }
 
-    // ✅ 현재 로그인한 유저의 닉네임 가져오기
+    //  현재 로그인한 유저의 닉네임 가져오기
     fun getCurrentUserNickname(callback: (String) -> Unit) {
         val currentUserUid = auth.currentUser?.uid
         if (currentUserUid == null) {

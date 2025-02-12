@@ -47,7 +47,7 @@ class MatchingViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    callback(false) // ❌ 이미 요청이 존재
+                    callback(false) //  이미 요청이 존재
                 } else {
                     val request = MatchRequest(
                         senderUid = senderUid,
@@ -72,7 +72,7 @@ class MatchingViewModel : ViewModel() {
     fun loadReceivedRequests(userUid: String, callback: (List<MatchRequest>) -> Unit) {
         firestore.collection("match_requests")
             .whereEqualTo("receiverUid", userUid)
-            .whereEqualTo("status", "pending") // ✅ "pending" 상태만 가져옴
+            .whereEqualTo("status", "pending") //  "pending" 상태만 가져옴
             .addSnapshotListener { snapshot, e ->
                 if (e != null) return@addSnapshotListener
                 callback(snapshot?.toObjects(MatchRequest::class.java) ?: emptyList())
@@ -85,7 +85,7 @@ class MatchingViewModel : ViewModel() {
     fun loadSentRequests(userUid: String, callback: (List<MatchRequest>) -> Unit) {
         firestore.collection("match_requests")
             .whereEqualTo("senderUid", userUid)
-            .whereEqualTo("status", "pending") // ✅ "pending" 상태만 가져옴
+            .whereEqualTo("status", "pending") //  "pending" 상태만 가져옴
             .addSnapshotListener { snapshot, e ->
                 if (e != null) return@addSnapshotListener
                 callback(snapshot?.toObjects(MatchRequest::class.java) ?: emptyList())
@@ -93,7 +93,7 @@ class MatchingViewModel : ViewModel() {
     }
 
     /**
-     * 🔹 매칭 요청 취소 기능 추가 ✅
+     * 🔹 매칭 요청 취소 기능 추가
      */
     fun cancelMatchRequest(request: MatchRequest) {
         firestore.collection("match_requests")
@@ -116,7 +116,7 @@ class MatchingViewModel : ViewModel() {
         val chatRoomRef = firestore.collection("chat_rooms").document(chatRoomId)
 
         firestore.runTransaction { transaction ->
-            transaction.update(matchRequestRef, "status", "accepted") // ✅ 상태 변경
+            transaction.update(matchRequestRef, "status", "accepted") //  상태 변경
 
             val chatRoom = mapOf(
                 "chatRoomId" to chatRoomId,
@@ -137,7 +137,7 @@ class MatchingViewModel : ViewModel() {
     fun declineMatchRequest(request: MatchRequest) {
         firestore.collection("match_requests")
             .document("${request.senderUid}_${request.receiverUid}")
-            .update("status", "rejected") // ✅ 거절 상태 변경
+            .update("status", "rejected") //  거절 상태 변경
     }
     /**
      * 🔹 채팅방 ID 생성
