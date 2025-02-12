@@ -131,6 +131,7 @@ fun RequestCard(
             Text(if (isReceived) "보낸 사람: $senderNickname" else "받은 사람: $myNickname")
             Text("상태: ${request.status}")
         }
+
     }
 
     if (showDialog) {

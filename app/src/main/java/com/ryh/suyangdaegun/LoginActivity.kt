@@ -103,7 +103,6 @@ class LoginActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit,
@@ -119,7 +118,8 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Spacer(modifier = Modifier.height(140.dp))
+        Spacer(modifier = Modifier.height(100.dp))
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -129,9 +129,9 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.suyang),
+                painter = painterResource(id = R.drawable.logo_sodamyeon_removebg_preview),
                 contentDescription = "Logo Image",
-                modifier = Modifier.size(width = 230.dp, height = 50.dp),
+                modifier = Modifier.size(width = 300.dp, height = 300.dp),
                 contentScale = ContentScale.Inside
             )
 
