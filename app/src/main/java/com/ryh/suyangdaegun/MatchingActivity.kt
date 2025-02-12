@@ -39,9 +39,11 @@ fun MatchingScreen(navController: NavHostController) {
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         Text(
             "매칭 요청", style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.height(50.dp),
@@ -52,19 +54,21 @@ fun MatchingScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("📩 받은 요청", style = MaterialTheme.typography.titleMedium)
-        LazyColumn(modifier = Modifier.height(300.dp)) {
-            items(receivedRequests) { request ->
-                RequestCard(request, isReceived = true, viewModel, navController)
+        Column() {
+            Text("📩 받은 요청", style = MaterialTheme.typography.titleMedium)
+            LazyColumn(modifier = Modifier.weight(0.5f)) {
+                items(receivedRequests) { request ->
+                    RequestCard(request, isReceived = true, viewModel, navController)
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Text("📤 보낸 요청", style = MaterialTheme.typography.titleMedium)
-        LazyColumn(modifier = Modifier.height(300.dp)) {
-            items(sentRequests) { request ->
-                SentRequestCard(request, viewModel)
+            Text("📤 보낸 요청", style = MaterialTheme.typography.titleMedium)
+            LazyColumn(modifier = Modifier.weight(0.5f)) {
+                items(sentRequests) { request ->
+                    SentRequestCard(request, viewModel)
+                }
             }
         }
     }
@@ -79,6 +83,20 @@ fun RequestCard(
     navController: NavHostController
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var senderNickname by remember { mutableStateOf("로딩 중...") }
+    var myNickname by remember { mutableStateOf("로딩 중...") }
+
+    LaunchedEffect(request.senderUid) {
+        UserHelper.getParticipantName(request.senderUid) { nickname ->
+            senderNickname = nickname
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        UserHelper.getCurrentUserNickname { nickname ->
+            myNickname = nickname
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -88,7 +106,7 @@ fun RequestCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(if (isReceived) "보낸 사람: ${request.senderEmail}" else "받은 사람: ${request.receiverEmail}")
+            Text(if (isReceived) "보낸 사람: $senderNickname" else "받은 사람: $myNickname")
             Text("상태: ${request.status}")
         }
     }
@@ -97,7 +115,7 @@ fun RequestCard(
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("매칭 요청") },
-            text = { Text("${request.senderEmail}님의 요청을 수락하시겠습니까?") },
+            text = { Text("$senderNickname 님의 요청을 수락하시겠습니까?") },
             confirmButton = {
                 Button(onClick = {
                     viewModel.approveMatchRequest(request) { chatRoomId ->
@@ -119,6 +137,14 @@ fun RequestCard(
 @Composable
 fun SentRequestCard(request: MatchRequest, viewModel: MatchingViewModel) {
     var showDialog by remember { mutableStateOf(false) }
+    var receiverNickname by remember { mutableStateOf("로딩 중...") }
+
+    LaunchedEffect(request.receiverUid) {
+        UserHelper.getParticipantName(request.receiverUid) { nickname ->
+            receiverNickname = nickname
+        }
+    }
+
 
     Card(
         modifier = Modifier
@@ -128,7 +154,7 @@ fun SentRequestCard(request: MatchRequest, viewModel: MatchingViewModel) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("받는 사람: ${request.receiverEmail}")
+            Text("받는 사람: $receiverNickname")
             Text("상태: ${request.status}")
         }
     }
