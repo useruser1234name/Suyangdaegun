@@ -25,10 +25,12 @@ fun MyPageScreen(navController: NavHostController) {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Text("채팅리스트", fontSize = 28.sp)
-        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            "마이페이지", fontSize = 25.sp,
+            modifier = Modifier.height(50.dp)
+        )
         Divider(modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = { navController.navigate("chatting/default") }) {
             Text("채팅 화면으로 이동")
         }

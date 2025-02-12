@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
@@ -38,8 +39,16 @@ fun MatchingScreen(navController: NavHostController) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("매칭 요청", style = MaterialTheme.typography.headlineSmall)
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+        Text(
+            "매칭 요청", style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.height(50.dp),
+            fontSize = 25.sp
+        )
+
+        Divider(modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(8.dp))
 

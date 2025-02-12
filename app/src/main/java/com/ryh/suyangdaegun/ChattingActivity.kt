@@ -2,6 +2,7 @@ package com.ryh.suyangdaegun
 
 import android.text.format.DateFormat
 import android.util.Patterns
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImagePainter.State.Empty.painter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.util.*
@@ -52,18 +55,19 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
         // ✅ 채팅방 헤더 추가
         Box(
             modifier = Modifier
-                .height(60.dp)
+                .weight(0.07f)
                 .fillMaxWidth()
                 .background(color = Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "채팅방", fontSize = 20.sp)
+            Text(text = "채팅방", fontSize = 25.sp)
         }
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(0.84f)
                 .padding(16.dp)
+
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -73,7 +77,8 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
                 var lastDate: String? = null
 
                 itemsIndexed(messages) { index, message ->
-                    val messageDate = DateFormat.format("yyyy년 MM월 dd일", Date(message.timestamp)).toString()
+                    val messageDate =
+                        DateFormat.format("yyyy년 MM월 dd일", Date(message.timestamp)).toString()
 
                     // ✅ 날짜가 바뀌면 구분선 추가
                     if (lastDate != messageDate) {
@@ -89,39 +94,53 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
                 }
             }
 
-            Row(
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFF7F7F7), shape = RoundedCornerShape(24.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .weight(0.09f),
+
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFF7F7F7), shape = RoundedCornerShape(24.dp))
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .weight(1f)
+                    .background(Color.White, shape = RoundedCornerShape(24.dp))
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                placeholder = { Text("메시지를 입력하세요") },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(
+                onClick = {
+                    if (input.isNotBlank()) {
+                        viewModel.sendMessage(input)
+                        input = ""
+                    }
+                },
+                modifier = Modifier
+                    .size(48.dp)
             ) {
-                TextField(
-                    value = input,
-                    onValueChange = { input = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(Color.White, shape = RoundedCornerShape(24.dp))
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    placeholder = { Text("메시지를 입력하세요") },
-                    singleLine = true
+                Icon(Icons.Default.Send, contentDescription = "전송", tint = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(
+                onClick = {
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_bbo),
+                    contentDescription = "뻐꾸기"
                 )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = {
-                        if (input.isNotBlank()) {
-                            viewModel.sendMessage(input)
-                            input = ""
-                        }
-                    },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(Color(0xFF8B5CF6), shape = RoundedCornerShape(50)) // 보라색 버튼
-                ) {
-                    Icon(Icons.Default.Send, contentDescription = "전송", tint = Color.White)
-                }
             }
 
         }
@@ -148,7 +167,6 @@ fun DateSeparator(date: String) {
         }
     }
 }
-
 
 
 // ✅ 메시지 UI
