@@ -39,7 +39,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // ✅ 새로운 메시지가 추가될 때 자동으로 맨 아래로 스크롤
+    //  새로운 메시지가 추가될 때 자동으로 맨 아래로 스크롤
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             coroutineScope.launch {
@@ -52,7 +52,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // ✅ 채팅방 헤더 추가
+        //  채팅방 헤더 추가
         Box(
             modifier = Modifier
                 .weight(0.07f)
@@ -80,7 +80,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
                     val messageDate =
                         DateFormat.format("yyyy년 MM월 dd일", Date(message.timestamp)).toString()
 
-                    // ✅ 날짜가 바뀌면 구분선 추가
+                    //  날짜가 바뀌면 구분선 추가
                     if (lastDate != messageDate) {
                         lastDate = messageDate
                         DateSeparator(messageDate)
@@ -89,7 +89,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
                     MessageBubble(
                         message = message,
                         isMine = message.senderId == currentUserUid,
-                        isUnread = index == messages.lastIndex // ✅ 마지막 메시지인지 확인
+                        isUnread = index == messages.lastIndex //  마지막 메시지인지 확인
                     )
                 }
             }
@@ -133,7 +133,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
             Spacer(modifier = Modifier.width(8.dp))
 
             IconButton(
-                onClick = {
+                onClick = {//ai기반 대화 코칭 서비스는 연결 필요
                 },
                 modifier = Modifier.size(48.dp)
             ) {
@@ -147,7 +147,7 @@ fun ChattingScreen(navController: NavHostController, viewModel: ChatViewModel) {
     }
 }
 
-// ✅ 날짜 구분선 UI
+//  날짜 구분선 UI
 @Composable
 fun DateSeparator(date: String) {
     Row(
@@ -169,7 +169,7 @@ fun DateSeparator(date: String) {
 }
 
 
-// ✅ 메시지 UI
+//  메시지 UI
 @Composable
 fun MessageBubble(message: ChatMessage, isMine: Boolean, isUnread: Boolean) {
     Row(
@@ -179,9 +179,14 @@ fun MessageBubble(message: ChatMessage, isMine: Boolean, isUnread: Boolean) {
         horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start
     ) {
         if (isMine) {
-            // ✅ 내 메시지: [ 안읽음(1) ] [ 시간 ] [ 말풍선 ]
+            //  내 메시지: [ 안읽음(1) ] [ 시간 ] [ 말풍선 ]
+            //현재 안 읽음은 상대방이 메시지를 보내야만 없어짐
+            //fcm토큰을 받아 개인에게 할당해야 하지만 비용 문제로 제고
+            //알림서비스도 fcm토큰 할당 필요
+            //fcm토큰 할당 시 좀 더 자연스러운 대화 가능할 것으로 사료됨
+            //isMine을 이용하여 상대방과 나의 채팅을 구분
             Row(verticalAlignment = Alignment.Bottom) {
-                // ✅ 안읽음(1)은 왼쪽 끝 바깥쪽으로 이동
+                //  안읽음(1)은 왼쪽 끝 바깥쪽으로 이동
                 if (isUnread) {
                     Text(
                         "1",
@@ -191,7 +196,7 @@ fun MessageBubble(message: ChatMessage, isMine: Boolean, isUnread: Boolean) {
                     )
                 }
 
-                // 시간 표시
+                // 전송 시간 표시
                 Text(
                     text = DateFormat.format("HH:mm", Date(message.timestamp)).toString(),
                     fontSize = 12.sp,
@@ -203,7 +208,7 @@ fun MessageBubble(message: ChatMessage, isMine: Boolean, isUnread: Boolean) {
                 ChatBubble(message.message, isMine)
             }
         } else {
-            // ✅ 상대 메시지: [ 말풍선 ] [ 시간 ] [ 안읽음(1) ]
+            // 상대 메시지: [ 말풍선 ] [ 시간 ] [ 안읽음(1) ]
             Row(verticalAlignment = Alignment.Bottom) {
                 // 말풍선 (상대방 메시지)
                 ChatBubble(message.message, isMine)
@@ -216,7 +221,7 @@ fun MessageBubble(message: ChatMessage, isMine: Boolean, isUnread: Boolean) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
-                // ✅ 안읽음(1)은 오른쪽 끝 바깥쪽으로 이동
+                // 안읽음(1)은 오른쪽 끝 바깥쪽으로 이동
                 if (isUnread) {
                     Text(
                         "1",

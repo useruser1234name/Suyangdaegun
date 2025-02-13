@@ -36,6 +36,7 @@ fun MatchingScreen(navController: NavHostController) {
     var receivedRequests by remember { mutableStateOf(emptyList<MatchRequest>()) }
     var sentRequests by remember { mutableStateOf(emptyList<MatchRequest>()) }
 
+    //런치드 이펙트 그는 신이야..!
     LaunchedEffect(Unit) {
         currentUser?.let { user ->
             viewModel.loadReceivedRequests(user.uid) { requests -> receivedRequests = requests }
@@ -170,7 +171,7 @@ fun RequestCard(
     }
 }
 
-@Composable
+@Composable  //내가 보내놓고 마음이 변해서 취소하고 싶을때 사용
 fun SentRequestCard(request: MatchRequest, viewModel: MatchingViewModel) {
     var showDialog by remember { mutableStateOf(false) }
     var receiverNickname by remember { mutableStateOf("로딩 중...") }

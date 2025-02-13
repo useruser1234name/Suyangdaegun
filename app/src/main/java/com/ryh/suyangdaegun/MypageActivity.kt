@@ -22,6 +22,8 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+//싹 다 더미
 @Composable
 fun MyPageScreen(navController: NavHostController) {
     Column(

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun BottomNavScreen(navController: NavHostController) { // ✅ `navController` 추가
+fun BottomNavScreen(navController: NavHostController) { // `navController` 추가
     val localNavController = rememberNavController()
 
     Scaffold(
@@ -71,7 +71,7 @@ fun BottomNavScreen(navController: NavHostController) { // ✅ `navController` �
                     label = { Text("인연") },
                     selected = currentRoute == "matching",
                     onClick = {
-                        localNavController.navigate("matching") { // ✅ `localNavController`로 변경
+                        localNavController.navigate("matching") { // `localNavController`로 변경
                             popUpTo(localNavController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
@@ -135,7 +135,7 @@ fun BottomNavScreen(navController: NavHostController) { // ✅ `navController` �
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("mainScreen") { MainScreen(navController) }
-            composable("matching") { MatchingScreen(navController) } // ✅ `navController` 올바르게 전달
+            composable("matching") { MatchingScreen(navController) }
             composable("chatList") { ChatListScreen(navController) }
             composable("myPage") { MyPageScreen(navController) }
         }

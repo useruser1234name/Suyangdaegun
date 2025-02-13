@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.StateFlow
 
 // 🔹 채팅 메시지 데이터 클래스
 data class ChatMessage(
-    val senderId: String = "",
-    val message: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val senderId: String = "", //메시지 전송자
+    val message: String = "", //메시지 내용
+    val timestamp: Long = System.currentTimeMillis() //메시지 보낸 시간
 )
+
+//리얼타임 파이어베이스db 에 chatRoomId(고유 uid 1개만 생성) 하위에 (메시지 내용, 보낸사람 표시)
 
 // 🔹 채팅 관리 ViewModel
 class ChatViewModel(private val chatRoomId: String) : ViewModel() {

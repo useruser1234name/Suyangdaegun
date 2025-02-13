@@ -81,6 +81,7 @@ fun MainScreen(rootNavController: NavHostController) {
                 contentAlignment = Alignment.Center
             ) {
                 Text("${UserState.nickname}님 오늘의 추천 상대입니다", fontSize = 20.sp)
+            // -> 현재 가입을 해야만 닉네임 뜨는데 수정 가능
             }
 
             Spacer(modifier = Modifier.width(30.dp))
@@ -167,7 +168,9 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
                 ) {
                     Button(
                         onClick = {
-                            val targetEmail = "ddong0273@gmail.com"
+                            val targetEmail = "ddong0273@gmail.com"  //현재 타겟이메일 설정 이유 == firestore 과부화 방지
+                            //추후 여러 유저 대상으로 매칭 확장 가능 -> recommendeduser와 연결해서 매칭 가능
+                            // 서버 연결 필요
                             viewModel.getUserUidByEmail(targetEmail) { targetUid ->
                                 if (targetUid != null) {
                                     viewModel.sendMatchRequestToFirestore(targetUid) { success ->
@@ -176,6 +179,7 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
                                     }
                                 } else {
                                     Log.e("Matching", "사용자를 찾을 수 없습니다.")
+                                //firestore users에 db 없는 경우 -> 회원탈퇴
                                 }
                             }
                         },

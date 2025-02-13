@@ -22,7 +22,9 @@ class MatchingViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
 
     /**
-     * 🔹 이메일을 UID로 변환하는 함수
+     *  이메일을 UID로 변환하는 함수 -> uid로 검색 시 보안 문제 발생 할 수 있게 때문에 사용자 구글 메일 주소 이용하여 매칭
+     *  매칭은 파이어 베이스 아닌 관상,사주 기반 매칭이기 때문에 flask mongodb같은  매칭 모델 구현하여 연결 필요   -> targetEmail
+     *  매칭을 기반으로 채팅방을 구성하기에 현재는 1:1 통신만 가능
      */
     fun getUserUidByEmail(targetEmail: String, callback: (String?) -> Unit) {
         firestore.collection("users")
@@ -36,7 +38,8 @@ class MatchingViewModel : ViewModel() {
     }
 
     /**
-     * 🔹 매칭 요청 Firestore에 저장 (중복 제거)
+     * 🔹 매칭 요청 Firestore에 저장 (중복 제거) a -> b 매칭 요청 시 accepted or pending 상태 일때
+     * 중복 요청 가능성 있기 때문에 중복 요청 방지
      */
     fun sendMatchRequestToFirestore(targetUid: String, callback: (Boolean) -> Unit) {
         val senderUid = auth.currentUser?.uid ?: return callback(false)
@@ -93,12 +96,12 @@ class MatchingViewModel : ViewModel() {
     }
 
     /**
-     * 🔹 매칭 요청 취소 기능 추가
+     * 🔹 매칭 요청 취소 기능 추가 (본인 -> 타 사용자에게 매칭 요청 했을 때 취소 가능)
      */
     fun cancelMatchRequest(request: MatchRequest) {
         firestore.collection("match_requests")
             .document("${request.senderUid}_${request.receiverUid}")
-            .delete()
+            .delete() //-> 요청 시 생성된 match 문서 삭제
             .addOnSuccessListener { Log.d("Matching", "매칭 요청이 취소되었습니다.") }
             .addOnFailureListener { Log.e("Matching", "매칭 요청 취소 실패", it) }
     }
@@ -133,6 +136,7 @@ class MatchingViewModel : ViewModel() {
 
     /**
      * 🔹 매칭 요청 거절
+     * 매칭 reject -> 파이어 베이스 match_requests 에서 문서 삭제
      */
     fun declineMatchRequest(request: MatchRequest) {
         firestore.collection("match_requests")

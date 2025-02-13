@@ -11,11 +11,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.ryh.suyangdaegun.R
 import com.ryh.suyangdaegun.SuyangdaegunApp
-
+//회원가입 파이어베이스 구글 로그인 - uid할당 -> 기능 사용(매칭, 메시지 전송 등)
 class AuthManager(private val activity: SuyangdaegunApp) {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val signInClient: SignInClient = Identity.getSignInClient(activity)
-
+    //구글 로그인
     fun signInWithGoogle(
         launcher: ActivityResultLauncher<IntentSenderRequest>,
         onFailure: (Exception) -> Unit // 🔹 추가된 콜백

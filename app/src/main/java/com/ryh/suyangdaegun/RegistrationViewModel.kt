@@ -31,6 +31,9 @@ class RegistrationViewModel : ViewModel() {
         if (nickname.isBlank() || birthdate.isBlank() || birthtime.isBlank() || gender.isBlank() || email.isBlank() || interests.isEmpty()) {
             return onFailure(Exception("회원가입 필수 정보 누락"))
         }
+//firestore에 users 저장 -> 사진은 저장되지 않지만 추후 가능성때문에 생성
+        //사진은 모델에만 전송됨
+
 
         val userData = mapOf(
             "uid" to uid, // 🔹 UID 기반 저장

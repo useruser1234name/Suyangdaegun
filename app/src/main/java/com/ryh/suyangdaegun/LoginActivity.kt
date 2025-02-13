@@ -38,9 +38,12 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         authManager = (application as SuyangdaegunApp).authManager
 
+        //사실 login screen 전에 loading screen을 적용하여 인증을 받으면
+        // 앱 삭제 안 하고도 인증을 받아 로그인 화면 으로 바로 이동이 가능하지만 이 역시 귀찮음
+        //근데 실험한다고 계속 설치하는게 더 귀찮음 근데 귀찮음
         // 🔹 기존 로그인 세션 유지 여부 확인 (로그아웃 방지)
         val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser == null) {  // ✅ Firebase에 등록되지 않은 경우 로그인 화면 유지
+        if (currentUser == null) {  // Firebase에 등록되지 않은 경우 로그인 화면 유지
             Log.d("LoginActivity", "No user logged in – staying in LoginActivity")
         } else {
             Log.d("LoginActivity", "Already logged in – navigating to MainActivity")
@@ -130,7 +133,7 @@ fun LoginScreen(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_sodamyeon_removebg_preview),
-                contentDescription = "Logo Image",
+                contentDescription = "Logo Image",  //누끼 따서 넣었는데 흐릿한게 나 같음
                 modifier = Modifier.size(width = 300.dp, height = 300.dp),
                 contentScale = ContentScale.Inside
             )

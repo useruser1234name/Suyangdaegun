@@ -50,6 +50,9 @@ import java.util.*
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Text
 
+
+//회원가입 플로우 여러 kt파일 만들기 귀찮아서 여기 몰아서 작성함
+
 class AccessionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -306,7 +309,7 @@ fun NicknameStep(
     }
 }
 
-@Composable
+@Composable  //현재는 취미만 저장 됨 사유 귀찮음 users class에 active, pet 추가 하면 저장 가능
 fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewModel) {
     val interests = listOf("독서", "요리", "게임", "사진", "음악감상", "영화관람", "노래방", "연극", "춤")
     val active = listOf("런닝", "등산", "자전거", "테니스", "캠핑", "골프", "헬스", "클라이밍")
@@ -722,7 +725,7 @@ fun CompleteStep(onComplete: () -> Unit, viewModel: RegistrationViewModel) {
 
         Button(
             onClick = {
-                // ✅ 회원가입 필수 데이터가 제대로 저장되었는지 확인 후 저장 진행
+                // 회원가입 필수 데이터가 제대로 저장되었는지 확인 후 저장 진행
                 viewModel.saveUserData(
                     onSuccess = { onComplete() },
                     onFailure = { e ->

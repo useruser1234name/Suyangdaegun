@@ -9,10 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
 
 // 🔹 채팅방 데이터 클래스
 data class ChatRoomItem(
-    val chatRoomId: String,
-    val participantName: String, // 반대편 사용자 이름만 표시
-    val lastMessage: String // 마지막 메시지
+    val chatRoomId: String, //채팅방 uid
+    val participantName: String, // 반대편 사용자 이름만 표시 fun getParticipantName
+    val lastMessage: String // 마지막 메시지 fun getLastMessageFromRealtimeDB
 )
+//리스트 카드 -> 대화참여자(상대편), 마지막 메시지 표시
 
 // 🔹 채팅방 리스트 관리 ViewModel
 class ChatListViewModel : ViewModel() {
