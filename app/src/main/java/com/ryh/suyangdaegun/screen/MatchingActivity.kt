@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,7 +18,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
+import com.ryh.suyangdaegun.R
+import com.ryh.suyangdaegun.model.MatchRequest
+import com.ryh.suyangdaegun.model.MatchingViewModel
+import com.ryh.suyangdaegun.model.UserHelper
+import com.ryh.suyangdaegun.navi.AppNavigatorMain
+import kotlinx.coroutines.launch
 
 class MatchingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +37,7 @@ class MatchingActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MatchingScreen(navController: NavHostController) {
     val viewModel: MatchingViewModel = viewModel()
@@ -36,13 +46,16 @@ fun MatchingScreen(navController: NavHostController) {
     var receivedRequests by remember { mutableStateOf(emptyList<MatchRequest>()) }
     var sentRequests by remember { mutableStateOf(emptyList<MatchRequest>()) }
 
-    //런치드 이펙트 그는 신이야..!
     LaunchedEffect(Unit) {
         currentUser?.let { user ->
             viewModel.loadReceivedRequests(user.uid) { requests -> receivedRequests = requests }
             viewModel.loadSentRequests(user.uid) { requests -> sentRequests = requests }
         }
     }
+
+    val tabTitles = listOf("📩 받은 요청", "📤 보낸 요청")
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -62,41 +75,72 @@ fun MatchingScreen(navController: NavHostController) {
             )
 
             Spacer(modifier = Modifier.weight(1f))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(0.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_alarm),
-                    contentDescription = "상담사 연결 아이콘" // 접근성을 위한 설명 추가
-                    , modifier = Modifier.size(28.dp)
-                )
-            }
+            Image(
+                painter = painterResource(R.drawable.ic_alarm),
+                contentDescription = "알람 아이콘",
+                modifier = Modifier.size(28.dp)
+            )
         }
         Divider(modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Column() {
-            Text("📩나에게 편지보낸 친구", fontSize = 20.sp)
-            LazyColumn(modifier = Modifier.weight(0.5f)) {
-                items(receivedRequests) { request ->
-                    RequestCard(request, isReceived = true, viewModel, navController)
-                }
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            tabTitles.forEachIndexed { index, title ->
+                Tab(
+                    text = { Text(title) },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    }
+                )
             }
+        }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text("📤내가 편지보낸 친구", fontSize = 20.sp)
-            LazyColumn(modifier = Modifier.weight(0.5f)) {
-                items(sentRequests) { request ->
-                    SentRequestCard(request, viewModel)
-                }
+        HorizontalPager(
+            count = tabTitles.size,
+            state = pagerState,
+            modifier = Modifier.weight(1f) // 👈 전체 화면을 차지하도록 설정
+        ) { page ->
+            when (page) {
+                0 -> ReceivedRequestsScreen(receivedRequests, viewModel, navController)
+                1 -> SentRequestsScreen(sentRequests, viewModel)
             }
         }
     }
 }
 
+@Composable
+fun ReceivedRequestsScreen(
+    receivedRequests: List<MatchRequest>,
+    viewModel: MatchingViewModel,
+    navController: NavHostController
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize() // 👈 화면 전체를 차지하도록 설정
+    ) {
+        items(receivedRequests) { request ->
+            RequestCard(request, true, viewModel, navController)
+        }
+    }
+}
+
+@Composable
+fun SentRequestsScreen(
+    sentRequests: List<MatchRequest>,
+    viewModel: MatchingViewModel
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize() // 👈 화면 전체를 차지하도록 설정
+    ) {
+        items(sentRequests) { request ->
+            SentRequestCard(request, viewModel)
+        }
+    }
+}
 
 @Composable
 fun RequestCard(

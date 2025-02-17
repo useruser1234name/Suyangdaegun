@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -101,4 +101,10 @@ dependencies {
 
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
+    //tappager
+    implementation ("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+
+
 }

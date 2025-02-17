@@ -10,7 +10,7 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.ryh.suyangdaegun.R
-import com.ryh.suyangdaegun.SuyangdaegunApp
+import com.ryh.suyangdaegun.model.SuyangdaegunApp
 //회원가입 파이어베이스 구글 로그인 - uid할당 -> 기능 사용(매칭, 메시지 전송 등)
 class AuthManager(private val activity: SuyangdaegunApp) {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()

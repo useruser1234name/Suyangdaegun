@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.navi
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
@@ -18,6 +18,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
+import com.ryh.suyangdaegun.screen.ChatListScreen
+import com.ryh.suyangdaegun.screen.MainScreen
+import com.ryh.suyangdaegun.screen.MatchingScreen
+import com.ryh.suyangdaegun.screen.MyPageScreen
+import com.ryh.suyangdaegun.R
 
 
 @Composable

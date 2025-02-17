@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.model
 
 import android.app.Application
 import android.util.Log

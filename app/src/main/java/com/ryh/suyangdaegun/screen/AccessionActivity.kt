@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.screen
 
 import android.content.Context
 import android.content.Intent
@@ -15,7 +15,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,19 +35,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import coil3.compose.rememberAsyncImagePainter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Text
+import com.ryh.suyangdaegun.R
+import com.ryh.suyangdaegun.model.RegistrationViewModel
 
 
 //회원가입 플로우 여러 kt파일 만들기 귀찮아서 여기 몰아서 작성함

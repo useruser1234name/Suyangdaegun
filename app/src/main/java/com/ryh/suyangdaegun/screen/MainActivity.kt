@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.screen
 
 import android.os.Bundle
 import android.util.Log
@@ -8,12 +8,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ryh.suyangdaegun.model.MatchingViewModel
+import com.ryh.suyangdaegun.navi.AppNavigatorMain
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,7 +166,7 @@ fun MatchUserCard(title: String, viewModel: MatchingViewModel, navController: Na
                 ) {
                     Button(
                         onClick = {
-                            val targetEmail = "ddong0273@gmail.com"  //현재 타겟이메일 설정 이유 == firestore 과부화 방지
+                            val targetEmail = "sts0514974@gmail.com"  //현재 타겟이메일 설정 이유 == firestore 과부화 방지
                             //추후 여러 유저 대상으로 매칭 확장 가능 -> recommendeduser와 연결해서 매칭 가능
                             // 서버 연결 필요
                             viewModel.getUserUidByEmail(targetEmail) { targetUid ->

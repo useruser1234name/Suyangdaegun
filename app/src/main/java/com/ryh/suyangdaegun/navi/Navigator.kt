@@ -1,4 +1,4 @@
-package com.ryh.suyangdaegun
+package com.ryh.suyangdaegun.navi
 
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
@@ -10,6 +10,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ryh.suyangdaegun.model.ChatViewModel
+import com.ryh.suyangdaegun.model.ChatViewModelFactory
+import com.ryh.suyangdaegun.screen.ChattingScreen
+import com.ryh.suyangdaegun.screen.LoginScreen
+import com.ryh.suyangdaegun.screen.MatchingScreen
 import com.ryh.suyangdaegun.auth.AuthManager
 
 @Composable
