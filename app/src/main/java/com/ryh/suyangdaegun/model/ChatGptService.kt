@@ -2,6 +2,7 @@ package com.ryh.suyangdaegun.model
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import okhttp3.*
@@ -32,7 +33,6 @@ class ChatGptService {
     }
 
     init {
-        // ✅ Remote Config 초기화 및 가져오기
         val configSettings = FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(3600)
             .build()
@@ -41,7 +41,7 @@ class ChatGptService {
         remoteConfig.fetchAndActivate()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d("ChatGptService", "🔥 Firebase Remote Config 업데이트 성공")
+                    Log.d("ChatGptService", "✅ Firebase Remote Config 업데이트 성공")
                 } else {
                     Log.e("ChatGptService", "🔥 Firebase Remote Config 업데이트 실패")
                 }
@@ -82,73 +82,6 @@ class ChatGptService {
         getResponse(messages, callback, n = 1)
     }
 
-    fun getFaceReadingAndFortune(
-        userId: String, // 🔹 Firestore 저장을 위해 UID 추가
-        birthdate: String,
-        birthtime: String,
-        faceAnalysis: JSONObject,
-        callback: (String) -> Unit
-    ) {
-        val apiKey = getApiKey()
-        if (apiKey.isEmpty()) {
-            callback("⚠️ OpenAI API 키 없음. Firebase 설정 확인 필요.")
-            return
-        }
-
-        val prompt = """
-    당신은 한국의 전통 사주 및 관상 전문가입니다.  
-사용자의 얼굴 관상 정보와 사주팔자를 분석하여 JSON 형태로 제공해주세요.  
-
-📌 **JSON 구조:**  
-- `"1"`: 관상 데이터 (`"1-1"`, `"1-2"`, `"1-3"`, ...)  
-- `"2"`: 사주 데이터 (`"2-1"`, `"2-2"`, `"2-3"`, ...)  
-
-🔹 사용자 정보:
-- 생년월일: $birthdate
-- 태어난 시간: $birthtime (한국 시간, GMT+9)
-- 얼굴 분석 데이터:
-```json
-${faceAnalysis.toString(4)}
-{
-  "1": {
-    "1-1": "전체적인 인생 관상 분석 결과",
-    "1-2": "연애운 관련 관상 분석",
-    "1-3": "직장운 관련 관상 분석",
-    "1-4": "재물운 관련 관상 분석",
-    "1-5": "건강운 관련 관상 분석",
-    "1-6": "성격 및 성향 분석"
-  },
-  "2": {
-    "2-1": "전체적인 인생 사주 분석 결과",
-    "2-2": "연애운 관련 사주 분석",
-    "2-3": "직장운 관련 사주 분석",
-    "2-4": "재물운 관련 사주 분석",
-    "2-5": "건강운 관련 사주 분석",
-    "2-6": "전체 인생 조언"
-  }
-}
-
-    📌 **반드시 위 JSON 구조를 유지하여 응답해주세요.**
-    """.trimIndent()
-
-        val messages = listOf(
-            mapOf("role" to "system", "content" to "당신은 한국의 전통 사주 및 관상 전문가입니다."),
-            mapOf("role" to "user", "content" to prompt)
-        )
-
-        getResponse(messages, { response ->
-            try {
-                val jsonResponse = JSONObject(response)
-
-                // ✅ Firestore에 저장
-                saveAnalysisToFirebase(userId, jsonResponse)
-
-                callback(response) // 🔹 성공 시 UI 업데이트 트리거
-            } catch (e: Exception) {
-                Log.e("ChatGptService", "🔥 JSON 파싱 오류: ${e.message}")
-            }
-        }, n = 1)
-    }
 
     fun getResponse(messages: List<Map<String, String>>, callback: (String) -> Unit, n: Int = 3) {
         val apiKey = getApiKey()
@@ -160,7 +93,7 @@ ${faceAnalysis.toString(4)}
         val json = JSONObject()
         json.put("model", "gpt-4-turbo")
         json.put("messages", JSONArray(messages))
-        json.put("max_tokens", 700)
+        json.put("max_tokens", 1500) // ✅ 응답 길이 증가
         json.put("n", n)
         json.put("temperature", 0.7)
 
@@ -187,24 +120,9 @@ ${faceAnalysis.toString(4)}
                     return
                 }
                 Log.d("ChatGptService", "✅ OpenAI API 응답: $responseBody")
+
                 try {
-                    // ✅ JSON 코드 블록(````json```) 제거
-                    var jsonResponseString = responseBody.trim()
-                    if (jsonResponseString.startsWith("```json")) {
-                        jsonResponseString = jsonResponseString.removePrefix("```json").trim()
-                    }
-                    if (jsonResponseString.endsWith("```")) {
-                        jsonResponseString = jsonResponseString.removeSuffix("```").trim()
-                    }
-
-                    val jsonResponse = JSONObject(jsonResponseString) // 🔹 이제 정상적으로 파싱 가능
-
-                    if (!jsonResponse.has("choices")) {
-                        Log.e("ChatGptService", "⚠️ OpenAI 응답에 'choices' 없음: $jsonResponse")
-                        callback("GPT 응답이 올바르지 않습니다. 다시 시도해주세요.")
-                        return
-                    }
-
+                    val jsonResponse = JSONObject(responseBody)
                     val choicesArray = jsonResponse.optJSONArray("choices") ?: JSONArray()
                     if (choicesArray.length() == 0) {
                         Log.e("ChatGptService", "⚠️ 'choices' 배열이 비어 있음")
@@ -212,31 +130,35 @@ ${faceAnalysis.toString(4)}
                         return
                     }
 
-                    val suggestions = mutableListOf<String>()
-                    for (i in 0 until choicesArray.length()) {
-                        val choice = choicesArray.optJSONObject(i)
-                        val message = choice?.optJSONObject("message")
-                        val content = message?.optString("content", null)
-                        if (!content.isNullOrEmpty()) {
-                            suggestions.add(content)
-                        } else {
-                            Log.e("ChatGptService", "⚠️ message.content가 없음: $message")
-                        }
+                    val responseText = choicesArray.optJSONObject(0)
+                        ?.optJSONObject("message")
+                        ?.optString("content", "")
+
+                    if (responseText.isNullOrEmpty()) {
+                        Log.e("ChatGptService", "⚠️ GPT 응답이 비어 있음")
+                        callback("GPT 응답이 올바르지 않습니다. 다시 시도해주세요.")
+                        return
                     }
 
-                    if (suggestions.isNotEmpty()) {
-                        callback(suggestions.joinToString("\n"))
-                    } else {
-                        Log.e("ChatGptService", "⚠️ GPT 응답에서 유효한 텍스트를 찾을 수 없음")
-                        callback("GPT 응답이 올바르지 않습니다. 다시 시도해주세요.")
+                    // ✅ JSON 코드 블록(````json`````) 제거
+                    var cleanedResponse = responseText.trim()
+                    if (cleanedResponse.startsWith("```json")) {
+                        cleanedResponse = cleanedResponse.removePrefix("```json").trim()
                     }
+                    if (cleanedResponse.endsWith("```")) {
+                        cleanedResponse = cleanedResponse.removeSuffix("```").trim()
+                    }
+
+                    // ✅ JSON 변환 없이 텍스트 그대로 반환
+                    callback(cleanedResponse)
                 } catch (e: Exception) {
-                    Log.e("ChatGptService", "🔥 JSON 파싱 오류: ${e.message}")
-                    callback("GPT 응답을 해석하는 중 오류가 발생했습니다.")
+                    Log.e("ChatGptService", "🔥 응답 처리 중 오류 발생: ${e.message}")
+                    callback("GPT 응답을 처리하는 중 오류가 발생했습니다.")
                 }
             }
         })
     }
+
 
 
 
@@ -270,13 +192,14 @@ fun saveAnalysisToFirebase(userId: String, jsonResponse: JSONObject) {
 
     firestore.collection("users")
         .document(userId)
-        .set(data) // 🔥 Firestore 저장
+        .set(data, SetOptions.merge()) // 기존 데이터 유지하면서 병합
         .addOnSuccessListener {
             Log.d("ChatGptService", "✅ Firestore에 관상+사주 데이터 저장 완료")
         }
         .addOnFailureListener { e ->
             Log.e("ChatGptService", "🔥 Firestore 저장 실패: ${e.message}")
         }
+
 }
 
 // 🔹 JSON을 Map으로 변환하는 함수 추가
