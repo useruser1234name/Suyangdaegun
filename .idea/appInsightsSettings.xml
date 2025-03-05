@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.ryh.suyangdaegun" />
+                  <option name="mobileSdkAppId" value="1:187361090084:android:3bf8d05557c4a0d3d756b1" />
+                  <option name="projectId" value="suyangdaegun-f88a5" />
+                  <option name="projectNumber" value="187361090084" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

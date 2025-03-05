@@ -85,6 +85,10 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.google.firebase:firebase-messaging:23.1.2")
+    implementation ("com.google.firebase:firebase-config:21.0.1")
+    implementation ("com.google.firebase:firebase-analytics-ktx:21.5.0")
+
+
 
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
@@ -101,6 +105,10 @@ dependencies {
 
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
+    // JSON 파싱 라이브러리
+    implementation ("org.json:json:20210307")
+
 
     //tappager
     implementation ("com.google.accompanist:accompanist-pager:0.28.0")

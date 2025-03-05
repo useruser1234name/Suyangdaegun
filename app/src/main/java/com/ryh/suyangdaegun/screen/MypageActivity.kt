@@ -19,11 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ryh.suyangdaegun.R
+import com.ryh.suyangdaegun.model.ChatGptService
+import com.ryh.suyangdaegun.model.UserHelper
 
 
 //싹 다 더미
 @Composable
 fun MyPageScreen(navController: NavHostController) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -192,32 +195,64 @@ fun GridMenuScreen() {
         "모임" to R.drawable.ic_moim
     )
 
+    var showDialog by remember { mutableStateOf(false) }
+    var fortuneText by remember { mutableStateOf("운세를 불러오는 중...") }
+    var isLoading by remember { mutableStateOf(false) }
+    var isButtonDisabled by remember { mutableStateOf(false) }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
             "메뉴", fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Divider(
-            color = Color.Gray, // 선의 색상
-            thickness = 0.5.dp,   // 선의 두께
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            color = Color.Gray,
+            thickness = 0.5.dp,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
 
-        GridMenu(menuItems)
+        // 🔹 isLoading, isButtonDisabled 전달 추가
+        GridMenu(menuItems, isLoading, isButtonDisabled) { label ->
+            if (label == "오늘의 운세") {
+                isLoading = true
+                isButtonDisabled = true
+
+                UserHelper.getUserBirthInfo { birthdate, birthtime ->
+                    if (birthdate.isNotEmpty() && birthtime.isNotEmpty()) {
+                        ChatGptService().getTodayFortune(birthdate, birthtime) { result ->
+                            fortuneText = result
+                            isLoading = false
+                            isButtonDisabled = false
+                            showDialog = true
+                        }
+                    } else {
+                        fortuneText = "⚠️ 생년월일 정보가 없습니다. 프로필을 업데이트하세요."
+                        isLoading = false
+                        isButtonDisabled = false
+                        showDialog = true
+                    }
+                }
+            }
+        }
+
+        if (showDialog) {
+            FortuneDialog(fortuneText, isLoading) { showDialog = false }
+        }
     }
 }
 
 @Composable
-fun GridMenu(menuItems: List<Pair<String, Int>>) {
+fun GridMenu(
+    menuItems: List<Pair<String, Int>>,
+    isLoading: Boolean,
+    isButtonDisabled: Boolean,
+    onItemClick: (String) -> Unit
+) {
     Column {
         menuItems.chunked(3).forEach { rowItems ->
             Row(
@@ -225,20 +260,30 @@ fun GridMenu(menuItems: List<Pair<String, Int>>) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 rowItems.forEach { (label, imageRes) ->
-                    MenuItem(label, imageRes)
+                    MenuItem(label, imageRes, isLoading, isButtonDisabled, onItemClick)
                 }
             }
         }
     }
 }
 
+
+
 @Composable
-fun MenuItem(label: String, imageRes: Int) {
+fun MenuItem(
+    label: String,
+    imageRes: Int,
+    isLoading: Boolean,
+    isButtonDisabled: Boolean,
+    onItemClick: (String) -> Unit
+) {
+    val isTodayFortune = label == "오늘의 운세"
+
     Card(
         modifier = Modifier
             .size(100.dp)
             .padding(8.dp)
-            .clickable { /* 클릭 이벤트 추가 가능 */ },
+            .clickable(enabled = !isButtonDisabled) { onItemClick(label) }, // 🔹 버튼 비활성화 관리
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -248,14 +293,83 @@ fun MenuItem(label: String, imageRes: Int) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = label,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp))
+            if (isTodayFortune && isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(32.dp)) // 🔹 버튼 내부 로딩
+            } else {
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = label,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            }
+
+            Text(
+                text = if (isTodayFortune && isLoading) "불러오는 중..." else label, // 🔹 로딩 중이면 텍스트 변경
+                fontSize = 18.sp,
+                color = Color.Black
             )
-            Text(label, fontSize = 18.sp, color = Color.Black)
         }
     }
+}
+
+@Composable
+fun FortuneDialog(fortuneText: String, isLoading: Boolean, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_bbo), // 🍀 아이콘 추가
+                    contentDescription = "운세 아이콘",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color(0xFF4CAF50) // 초록색 행운 느낌
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "🌟 오늘의 운세",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp, max = 400.dp) // 다이얼로그 크기 조정
+                    .verticalScroll(rememberScrollState()) // ✅ 스크롤 가능하도록 설정
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    Text(
+                        text = "운세를 불러오는 중...",
+                        fontSize = 18.sp,
+                        color = Color.Gray
+                    )
+                } else {
+                    Text(
+                        text = fortuneText,
+                        fontSize = 18.sp,
+                        lineHeight = 26.sp, // ✅ 줄 간격 늘려 가독성 향상
+                        color = Color.DarkGray
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)) // 초록색 버튼
+            ) {
+                Text("닫기", fontSize = 18.sp, color = Color.White)
+            }
+        },
+        shape = RoundedCornerShape(16.dp), // 모서리 둥글게
+        containerColor = Color.White // 배경색
+    )
 }

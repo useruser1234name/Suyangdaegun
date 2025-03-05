@@ -8,12 +8,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -182,37 +184,98 @@ fun RequestCard(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("매칭 요청") },
-            text = { Text("$senderNickname 님의 요청을 수락하시겠습니까?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.approveMatchRequest(request) { chatRoomId ->
-                            navController.navigate("chatting/$chatRoomId") // 수락 후 자동 이동
-                        }
-
-                        showDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bbo), // ❤️ 아이콘 추가
+                        contentDescription = "매칭 아이콘",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Red
                     )
-                ) { Text("수락") }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "💌 매칭 요청",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
             },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        viewModel.declineMatchRequest(request)
-                        showDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "**${senderNickname}** 님이 매칭을 요청하셨습니다!",
+                        fontSize = 18.sp,
+                        color = Color.DarkGray
                     )
-                ) { Text("거절") }
-            }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_heart), // 하트 이미지 추가
+                        contentDescription = "Heart Icon",
+                        modifier = Modifier.size(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "수락하면 채팅방이 생성됩니다.",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // ✅ 수락 버튼 - 초록색
+                    Button(
+                        onClick = {
+                            viewModel.approveMatchRequest(request) { chatRoomId ->
+                                navController.navigate("chatting/$chatRoomId") // 채팅방 이동
+                            }
+                            showDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF2E7D32), // 초록색
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = "✅ 수락", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    // ✅ 거절 버튼 - 회색
+                    Button(
+                        onClick = {
+                            viewModel.declineMatchRequest(request)
+                            showDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF757575), // 회색
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = "❌ 거절", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            shape = RoundedCornerShape(16.dp), // 다이얼로그 모서리 둥글게
+            containerColor = Color.White // 다이얼로그 배경 색상
         )
     }
+
 }
 
 @Composable  //내가 보내놓고 마음이 변해서 취소하고 싶을때 사용
@@ -243,29 +306,91 @@ fun SentRequestCard(request: MatchRequest, viewModel: MatchingViewModel) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("매칭 요청 관리") },
-            text = { Text("이 요청을 취소하시겠습니까?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.cancelMatchRequest(request)
-                        showDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bbo),
+                        contentDescription = "경고 아이콘",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Red
                     )
-                ) { Text("요청 취소") }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "🚨 요청 취소",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
             },
-            dismissButton = {
-                Button(
-                    onClick = { showDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "**${receiverNickname}** 님에게 보낸 매칭 요청을 취소하시겠습니까?",
+                        fontSize = 18.sp,
+                        color = Color.DarkGray
                     )
-                ) { Text("유지") }
-            }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_bbo), // ⚠️ 아이콘 추가
+                        contentDescription = "경고 아이콘",
+                        modifier = Modifier.size(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "취소 후 되돌릴 수 없습니다.",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // ✅ 요청 취소 버튼 - 빨간색
+                    Button(
+                        onClick = {
+                            viewModel.cancelMatchRequest(request)
+                            showDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFD32F2F), // 빨간색
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = "🛑 취소", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    // ✅ 유지 버튼 - 회색
+                    Button(
+                        onClick = { showDialog = false },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF757575), // 회색
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = "🔄 유지", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            shape = RoundedCornerShape(16.dp), // 다이얼로그 모서리 둥글게
+            containerColor = Color.White // 다이얼로그 배경 색상
         )
     }
+
 }

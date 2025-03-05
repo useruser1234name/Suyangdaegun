@@ -50,13 +50,17 @@ fun ChatListScreen(navController: NavHostController, viewModel: ChatListViewMode
                     contentDescription = "알람 아이콘",
                     modifier = Modifier.size(28.dp)
                 )
+
                 Spacer(modifier = Modifier.width(12.dp))
+
                 Image(
                     painter = painterResource(R.drawable.ic_alarm),
                     contentDescription = "상담사 연결 아이콘",
                     modifier = Modifier.size(28.dp)
                 )
+
                 Spacer(modifier = Modifier.width(12.dp))
+
                 Image(
                     painter = painterResource(R.drawable.ic_setting),
                     contentDescription = "세팅 아이콘",
@@ -64,12 +68,29 @@ fun ChatListScreen(navController: NavHostController, viewModel: ChatListViewMode
                 )
             }
         }
+
         Divider(modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(8.dp))
-        LazyColumn {
-            items(chatRooms) { chatRoom ->
-                ChatRoomItem(chatRoom, navController)
+
+        if (chatRooms.isEmpty()) {
+            // ✅ 채팅방이 없을 때 안내 메시지를 가운데 정렬하여 표시
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center // 📌 화면 중앙 정렬
+            ) {
+                Text(
+                    text = "서로 편지를 주고 받았을 때 대화가 시작돼요",
+                    fontSize = 18.sp,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            LazyColumn {
+                items(chatRooms) { chatRoom ->
+                    ChatRoomItem(chatRoom, navController)
+                }
             }
         }
     }

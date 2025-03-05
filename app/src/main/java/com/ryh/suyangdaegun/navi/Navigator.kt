@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,6 +17,7 @@ import com.ryh.suyangdaegun.screen.ChattingScreen
 import com.ryh.suyangdaegun.screen.LoginScreen
 import com.ryh.suyangdaegun.screen.MatchingScreen
 import com.ryh.suyangdaegun.auth.AuthManager
+
 
 @Composable
 fun AppNavigatorAuth(
@@ -51,13 +53,14 @@ fun AppNavigatorAuth(
 @Composable
 fun AppNavigatorMain(navController: NavHostController = rememberNavController()) {
     val owner = LocalViewModelStoreOwner.current ?: error("No ViewModelStoreOwner found")
+    val context = LocalContext.current
     CompositionLocalProvider(LocalViewModelStoreOwner provides owner) {
         NavHost(navController = navController, startDestination = "bottomNav") {
             composable("bottomNav") { BottomNavScreen(navController) } //  수정된 BottomNavScreen 사용
             composable("chatting/{chatRoomId}") { backStackEntry ->
                 val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: "default"
                 val chatViewModel: ChatViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                    factory = ChatViewModelFactory(chatRoomId)
+                    factory = ChatViewModelFactory(chatRoomId, context)
                 )
                 ChattingScreen(navController, chatViewModel)
             }

@@ -49,3 +49,4 @@ class RegistrationViewModel : ViewModel() {
             .addOnFailureListener { e -> onFailure(e) }
     }
 }
+
