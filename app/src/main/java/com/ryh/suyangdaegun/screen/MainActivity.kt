@@ -231,7 +231,7 @@ fun MatchUserCard(
                     // ✅ YES 버튼 - 초록색 (성공 느낌 강조)
                     Button(
                         onClick = {
-                            val targetEmail = "sts0514974@gmail.com"
+                            val targetEmail = "a01062946631@gmail.com"
                             viewModel.getUserUidByEmail(targetEmail) { targetUid ->
                                 if (targetUid != null) {
                                     viewModel.sendMatchRequestToFirestore(targetUid) { success ->

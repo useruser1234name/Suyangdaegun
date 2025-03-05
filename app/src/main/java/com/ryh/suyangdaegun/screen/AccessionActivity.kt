@@ -115,7 +115,8 @@ fun GenderStep(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_back),
@@ -123,34 +124,23 @@ fun GenderStep(
                 modifier = Modifier.size(30.dp)
             )
 
-            Box( // 🔹 중앙 정렬을 위한 Box 사용
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
                 Text(
-                    "사주정보 입력",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                            append("STEP 1")
+                        }
+                        append(" /5") // 기본 색상 유지
+                    },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
                 )
-            }
 
-            Spacer(modifier = Modifier.width(30.dp))
         }
         Spacer(modifier = Modifier.height(50.dp))
 
-        Text(
-            buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                    append("STEP 1")
-                }
-                append(" /4") // 기본 색상 유지
-            },
-            fontWeight = FontWeight.Bold,
-        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text("안녕하세요! 성별을 알려주세요.", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+        Text("안녕하세요! 성별을 알려주세요!", fontWeight = FontWeight.Bold, fontSize = 24.sp)
 
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -238,7 +228,9 @@ fun NicknameStep(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_back),
@@ -246,50 +238,49 @@ fun NicknameStep(
                 modifier = Modifier.size(30.dp)
             )
 
-            Box( // 🔹 중앙 정렬을 위한 Box 사용
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
                 Text(
-                    "사주정보 입력",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                            append("STEP 2")
+                        }
+                        append(" /5") // 기본 색상 유지
+                    },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
                 )
-            }
-
-            Spacer(modifier = Modifier.width(30.dp))
         }
 
         Spacer(modifier = Modifier.height(50.dp))
-        Text(
-            buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                    append("STEP 2")
-                }
-                append(" /4") // 기본 색상 유지
-            },
-            fontWeight = FontWeight.Bold,
-        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "어떤 이름으로\n불러드릴까요?",
+            "이름을 입력해주세요!",
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp
         )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        Text(
+            "본명을 사용해보세요.\n실제 프로필이 사용자에게 더 매력적입니다",
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
+        )
+
+
         Spacer(modifier = Modifier.height(30.dp))
 
         OutlinedTextField(
             value = UserState.nickname,
             onValueChange = { UserState.nickname = it },
-            label = { Text("닉네임") },
+            label = { Text("이름") },
             modifier = Modifier
                 .fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.weight(1f))
+
         Button(
             onClick = {
                 if (UserState.nickname.isNotBlank()) {
@@ -301,7 +292,7 @@ fun NicknameStep(
                 .fillMaxWidth()
                 .height(60.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE75480))
         ) {
             Text("다음", fontSize = 28.sp, color = Color.White)
         }
@@ -329,7 +320,8 @@ fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewM
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_back),
@@ -337,31 +329,20 @@ fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewM
                 modifier = Modifier.size(30.dp)
             )
 
-            Box( // 🔹 중앙 정렬을 위한 Box 사용
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "사주정보 입력",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
 
-            Spacer(modifier = Modifier.width(30.dp))
+                Text(
+                    buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                            append("STEP 3")
+                        }
+                        append(" /5") // 기본 색상 유지
+                    },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                )
         }
         Spacer(modifier = Modifier.height(50.dp))
-        Text(
-            buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                    append("STEP 3")
-                }
-                append(" /4") // 기본 색상 유지
-            },
-            fontWeight = FontWeight.Bold,
-        )
+
         Spacer(modifier = Modifier.height(16.dp))
         Text("관심사를 선택해 주세요", fontWeight = FontWeight.Bold, fontSize = 24.sp)
 
@@ -532,7 +513,7 @@ fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewM
                 .height(60.dp),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2D3A31)
+                containerColor = Color(0xFFE75480)
             )
         ) {
             Text("다음", fontSize = 28.sp)
@@ -594,7 +575,8 @@ fun BirthdateStep(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_back),
@@ -602,32 +584,21 @@ fun BirthdateStep(
                 modifier = Modifier.size(30.dp)
             )
 
-            Box( // 🔹 중앙 정렬을 위한 Box 사용
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
                 Text(
-                    "사주정보 입력",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                            append("STEP 4")
+                        }
+                        append(" /5") // 기본 색상 유지
+                    },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
                 )
-            }
 
-            Spacer(modifier = Modifier.width(30.dp))
         }
         Spacer(modifier = Modifier.height(50.dp))
 
-        Text(
-            buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                    append("STEP 4")
-                }
-                append(" /4") // 기본 색상 유지
-            },
-            fontWeight = FontWeight.Bold,
-        )
+
         Spacer(modifier = Modifier.height(16.dp))
         Text("생년월일, 태어난 시간을 입력해 주세요", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
@@ -698,16 +669,25 @@ fun BirthdateStep(
                         viewModel.setProfilePicture(selectedImageUri.toString())
 
                         // 🔹 FaceAnalysisScreen에 데이터 전달
-                        navController.currentBackStackEntry?.savedStateHandle?.set("birthdate", birthdate)
-                        navController.currentBackStackEntry?.savedStateHandle?.set("birthtime", birthtime)
-                        navController.currentBackStackEntry?.savedStateHandle?.set("selectedImageUri", selectedImageUri.toString())
+                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                            "birthdate",
+                            birthdate
+                        )
+                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                            "birthtime",
+                            birthtime
+                        )
+                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                            "selectedImageUri",
+                            selectedImageUri.toString()
+                        )
 
                         navController.navigate("face-analysis")
                     } else {
                         Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE75480))
             ) {
                 Text("다음", fontSize = 28.sp, color = Color.White)
             }
