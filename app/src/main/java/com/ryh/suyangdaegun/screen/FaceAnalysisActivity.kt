@@ -19,7 +19,8 @@ import coil3.compose.rememberAsyncImagePainter
 fun FaceAnalysisScreen(navController: NavHostController) {
     val birthdate = navController.previousBackStackEntry?.savedStateHandle?.get<String>("birthdate") ?: "생년월일 없음"
     val birthtime = navController.previousBackStackEntry?.savedStateHandle?.get<String>("birthtime") ?: "태어난 시간 없음"
-    val selectedImageUri = navController.previousBackStackEntry?.savedStateHandle?.get<Uri>("selectedImageUri")
+    val selectedImageUriString = navController.previousBackStackEntry?.savedStateHandle?.get<String>("selectedImageUri")
+    val selectedImageUri = selectedImageUriString?.let { Uri.parse(it) } // 🔹 String → Uri 변환
 
     var isLoading by remember { mutableStateOf(false) }
     var isAnalysisDone by remember { mutableStateOf(false) }
@@ -84,46 +85,28 @@ fun FaceAnalysisScreen(navController: NavHostController) {
 
             if (!isAnalysisDone) {
                 Button(
-                    onClick = { isLoading = true }, // 🔹 버튼 클릭 시 로딩 시작
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
+                    onClick = { isLoading = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
                 ) {
                     Text("분석", fontSize = 24.sp, color = Color.White)
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            if (isLoading) {
-                Text("🔹 얼굴 분석 중...")
+            if (isAnalysisDone) {
+                Text(" 얼굴 분석 결과")
+                Text(faceResult)
                 Spacer(modifier = Modifier.height(16.dp))
-                CircularProgressIndicator()
+                Text(" 사주 분석 결과")
+                Text(fortuneResult)
             }
 
-            if (isAnalysisDone) {
-                Text("🔹 얼굴 분석 결과")
-                Text(faceResult)
+            Spacer(modifier = Modifier.height(32.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text("🔹 사주 분석 결과")
-                Text(fortuneResult)
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = { navController.navigate("complete") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
-                ) {
-                    Text("완료", fontSize = 24.sp, color = Color.White)
-                }
+            Button(
+                onClick = { navController.navigate("complete") },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
+            ) {
+                Text("완료", fontSize = 24.sp, color = Color.White)
             }
         }
     }

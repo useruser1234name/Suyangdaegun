@@ -92,6 +92,7 @@ fun AccessionNavGraph(
         composable("nickname") { NicknameStep(navController, viewModel) }
         composable("interests") { InterestsStep(navController, viewModel) }
         composable("birthdate") { BirthdateStep(navController, viewModel) }
+        composable("face-analysis") { FaceAnalysisScreen(navController) }
         composable("complete") { CompleteStep(onComplete = onComplete, viewModel = viewModel) }
     }
 }
@@ -691,10 +692,17 @@ fun BirthdateStep(
             Button(
                 onClick = {
                     if (birthdate.isNotBlank() && birthtime.isNotBlank() && selectedImageUri != null) {
+                        // 🔹 viewModel에 저장
                         viewModel.setBirthdate(birthdate)
                         viewModel.setBirthtime(birthtime)
                         viewModel.setProfilePicture(selectedImageUri.toString())
-                        navController.navigate("complete")
+
+                        // 🔹 FaceAnalysisScreen에 데이터 전달
+                        navController.currentBackStackEntry?.savedStateHandle?.set("birthdate", birthdate)
+                        navController.currentBackStackEntry?.savedStateHandle?.set("birthtime", birthtime)
+                        navController.currentBackStackEntry?.savedStateHandle?.set("selectedImageUri", selectedImageUri.toString())
+
+                        navController.navigate("face-analysis")
                     } else {
                         Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
