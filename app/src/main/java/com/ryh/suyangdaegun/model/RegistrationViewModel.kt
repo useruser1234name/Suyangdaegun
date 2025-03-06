@@ -23,18 +23,19 @@ class RegistrationViewModel : ViewModel() {
     fun setInterests(value: List<String>) { interests = value }
     fun setProfilePicture(value: String) { profilePictureUrl = value }
 
+    fun getBirthdate(): String = birthdate
+    fun getBirthtime(): String = birthtime
+    fun getProfilePicture(): String? = profilePictureUrl
+
     fun saveUserData(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val uid = auth.currentUser?.uid ?: return onFailure(Exception("User not authenticated"))
 
         if (nickname.isBlank() || birthdate.isBlank() || birthtime.isBlank() || gender.isBlank() || email.isBlank() || interests.isEmpty()) {
             return onFailure(Exception("회원가입 필수 정보 누락"))
         }
-//firestore에 users 저장 -> 사진은 저장되지 않지만 추후 가능성때문에 생성
-        //사진은 모델에만 전송됨
-
 
         val userData = mapOf(
-            "uid" to uid, // 🔹 UID 기반 저장
+            "uid" to uid,
             "nickname" to nickname,
             "birthdate" to birthdate,
             "birthtime" to birthtime,
@@ -44,7 +45,7 @@ class RegistrationViewModel : ViewModel() {
             "profilePicture" to profilePictureUrl
         )
 
-        firestoreDb.document(uid).set(userData) //  Firestore에 UID 기반 저장
+        firestoreDb.document(uid).set(userData)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure(e) }
     }

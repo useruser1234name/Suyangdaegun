@@ -92,7 +92,8 @@ fun AccessionNavGraph(
         composable("nickname") { NicknameStep(navController, viewModel) }
         composable("interests") { InterestsStep(navController, viewModel) }
         composable("birthdate") { BirthdateStep(navController, viewModel) }
-        composable("face-analysis") { FaceAnalysisScreen(navController) }
+        composable("photo-pick") { PhotopicStep(navController, viewModel) }
+        composable("face-analysis") { FaceAnalysisScreen(navController, viewModel) }
         composable("complete") { CompleteStep(onComplete = onComplete, viewModel = viewModel) }
     }
 }
@@ -124,16 +125,16 @@ fun GenderStep(
                 modifier = Modifier.size(30.dp)
             )
 
-                Text(
-                    buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                            append("STEP 1")
-                        }
-                        append(" /5") // 기본 색상 유지
-                    },
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                        append("1")
+                    }
+                    append("/5") // 기본 색상 유지
+                },
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
 
         }
         Spacer(modifier = Modifier.height(50.dp))
@@ -238,16 +239,16 @@ fun NicknameStep(
                 modifier = Modifier.size(30.dp)
             )
 
-                Text(
-                    buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                            append("STEP 2")
-                        }
-                        append(" /5") // 기본 색상 유지
-                    },
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                        append("STEP 2")
+                    }
+                    append(" /5") // 기본 색상 유지
+                },
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
         }
 
         Spacer(modifier = Modifier.height(50.dp))
@@ -330,16 +331,16 @@ fun InterestsStep(navController: NavHostController, viewModel: RegistrationViewM
             )
 
 
-                Text(
-                    buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                            append("STEP 3")
-                        }
-                        append(" /5") // 기본 색상 유지
-                    },
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                        append("3")
+                    }
+                    append("/5") // 기본 색상 유지
+                },
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
         }
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -529,6 +530,104 @@ fun BirthdateStep(
 ) {
     var birthdate by remember { mutableStateOf("") }
     var birthtime by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .systemBarsPadding(),
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "back",
+                modifier = Modifier.size(30.dp)
+            )
+
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                        append("4")
+                    }
+                    append("/5")
+                },
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+
+        Text("생년월일, 태어난 시간을 입력해 주세요", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = birthdate,
+            onValueChange = { birthdate = it },
+            label = { Text("예시) 1974.02.13") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = birthtime,
+            onValueChange = { birthtime = it },
+            label = { Text("태어난시간 00:00") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = {
+                if (birthdate.isNotBlank() && birthtime.isNotBlank()) {
+                    // 🔹 viewModel에 저장
+                    viewModel.setBirthdate(birthdate)
+                    viewModel.setBirthtime(birthtime)
+
+                    // 🔹 다음 화면으로 데이터 전달
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        "birthdate",
+                        birthdate
+                    )
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        "birthtime",
+                        birthtime
+                    )
+
+                    navController.navigate("photo-pick")
+                } else {
+                    Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE75480)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+                .height(60.dp),
+            shape = RoundedCornerShape(20.dp),
+        ) {
+            Text("다음", fontSize = 28.sp, color = Color.White)
+        }
+    }
+}
+
+
+@Composable
+fun PhotopicStep(
+    navController: androidx.navigation.NavHostController,
+    viewModel: RegistrationViewModel
+) {
+
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
 
@@ -538,6 +637,7 @@ fun BirthdateStep(
         val file = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
+
 
     var tempImageUri by remember { mutableStateOf(createImageFile(context)) }
 
@@ -563,6 +663,7 @@ fun BirthdateStep(
         }
     }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -571,6 +672,7 @@ fun BirthdateStep(
         verticalArrangement = Arrangement.Top,
 
         ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -584,99 +686,100 @@ fun BirthdateStep(
                 modifier = Modifier.size(30.dp)
             )
 
-                Text(
-                    buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
-                            append("STEP 4")
-                        }
-                        append(" /5") // 기본 색상 유지
-                    },
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFFFFA500))) {
+                        append("5")
+                    }
+                    append("/5") // 기본 색상 유지
+                },
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
 
         }
         Spacer(modifier = Modifier.height(50.dp))
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("생년월일, 태어난 시간을 입력해 주세요", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = birthdate,
-            onValueChange = { birthdate = it },
-            label = { Text("예시) 1974.02.13") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = birthtime,
-            onValueChange = { birthtime = it },
-            label = { Text("태어난시간 00:00") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Button(
-                onClick = { pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))
-            ) {
-                Text("갤러리 선택")
-            }
-            Button(onClick = {
-                if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA)
-                    == PackageManager.PERMISSION_GRANTED
-                ) {
-                    tempImageUri = createImageFile(context)
-                    takePictureLauncher.launch(tempImageUri)
-                } else {
-                    permissionLauncher.launch(android.Manifest.permission.CAMERA)
-                }
-            }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D3A31))) {
-                Text("사진 촬영")
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally // 🔹 가로 중앙 정렬
+                .wrapContentHeight()
+                .align(Alignment.CenterHorizontally), // 🔹 컬럼을 가로 중앙 정렬
+            horizontalAlignment = Alignment.CenterHorizontally // 🔹 내부 요소들도 중앙 정렬
         ) {
             if (selectedImageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(selectedImageUri),
                     contentDescription = "선택된 이미지",
-                    modifier = Modifier.size(150.dp)
+                    modifier = Modifier.size(300.dp)
                 )
             } else {
                 Text("사진이 선택되지 않았습니다")
+            }
+        }
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Button(
+                onClick =
+                {
+                    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                colors = ButtonDefaults
+                    .buttonColors(containerColor = Color(0xFFE75480)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Text("갤러리 선택")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    if (birthdate.isNotBlank() && birthtime.isNotBlank() && selectedImageUri != null) {
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            android.Manifest.permission.CAMERA
+                        )
+                        == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        tempImageUri = createImageFile(context)
+                        takePictureLauncher.launch(tempImageUri)
+                    } else {
+                        permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                    }
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                colors = ButtonDefaults
+                    .buttonColors(containerColor = Color(0xFFE75480)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Text("사진 촬영")
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally // 🔹 가로 중앙 정렬
+        ) {
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = {
+                    if (selectedImageUri != null) {
                         // 🔹 viewModel에 저장
-                        viewModel.setBirthdate(birthdate)
-                        viewModel.setBirthtime(birthtime)
                         viewModel.setProfilePicture(selectedImageUri.toString())
 
                         // 🔹 FaceAnalysisScreen에 데이터 전달
-                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                            "birthdate",
-                            birthdate
-                        )
-                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                            "birthtime",
-                            birthtime
-                        )
                         navController.currentBackStackEntry?.savedStateHandle?.set(
                             "selectedImageUri",
                             selectedImageUri.toString()
@@ -684,16 +787,24 @@ fun BirthdateStep(
 
                         navController.navigate("face-analysis")
                     } else {
-                        Toast.makeText(context, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "사진을 선택해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE75480))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE75480)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(20.dp)
             ) {
                 Text("다음", fontSize = 28.sp, color = Color.White)
             }
         }
+
     }
+
 }
+
 
 @Composable
 fun CompleteStep(onComplete: () -> Unit, viewModel: RegistrationViewModel) {
@@ -705,9 +816,11 @@ fun CompleteStep(onComplete: () -> Unit, viewModel: RegistrationViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(150.dp))
-        Text("회원가입 완료!", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(100.dp))
+
+        Text("회원가입 완료!", style = MaterialTheme.typography.headlineMedium, fontSize = 24.sp)
+
+        Spacer(modifier = Modifier.weight(1f))
 
         Button(
             onClick = {
@@ -720,13 +833,14 @@ fun CompleteStep(onComplete: () -> Unit, viewModel: RegistrationViewModel) {
                 )
             }, modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp),
+                .height(60.dp)
+                .padding(bottom = 16.dp),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2D3A31)
+                containerColor = Color(0xFFE75480)
             )
         ) {
-            Text("메인 화면으로 이동")
+            Text("메인 화면으로 이동", fontSize = 28.sp, color = Color.White)
         }
     }
 }

@@ -133,7 +133,7 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.logo_sodamyeon_removebg_preview),
                 contentDescription = "Logo Image",  //누끼 따서 넣었는데 흐릿한게 나 같음
-                modifier = Modifier.size(width = 300.dp, height = 300.dp),
+                modifier = Modifier.size(width = 400.dp, height = 200.dp),
                 contentScale = ContentScale.Inside
             )
 
@@ -142,7 +142,7 @@ fun LoginScreen(
             Text(text = "새로운 인연", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(64.dp))
 
         Button(
             onClick = onGoogleSignInClick,
